@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "final-project"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [{include = "final_project"}]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+dash = "^2.8.1"
+pandas = "^1.5.3"
+dash-bootstrap-components = "^1.3.1"
+dash-core-components = "^2.0.0"
+matplotlib = "^3.7.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
