@@ -54,26 +54,18 @@ MASK = 255 * MASK.astype(int)
 
 
 #### filenames ###
-# TX_from = "Text_Preprocessing/"
-# PA_from = "Text_Preprocessing/bills_pennsylvania.json"
+TX_from = "../pdf_links_texas.json"
+PA_from = "bills_pennsylvania.json"
 
-# TX_to_table = "cody_bills/assets/table_texas.txt"
-# PA_to_table = "cody_bills/assets/table_pennsylvania.txt"
+TX_to_table = "table_texas.txt"
+PA_to_table = "table_pennsylvania.txt"
 
-# TX_to_word = "cody_bills/assets/words_texas"
-# PA_to_word = "cody_bills/assets/words_pennsylvania"
+TX_to_word = "words_texas"
+PA_to_word = "words_pennsylvania"
 
-# TX_to_bigram = "cody_bills/assets/bigrams_texas"
-# PA_to_bigram = "cody_bills/assets/bigrams_pennsylvania"
+TX_to_bigram = "bigrams_texas"
+PA_to_bigram = "bigrams_pennsylvania"
 
-
-def file_to_dict(filename):
-    with open(filename) as f:
-        state_dict = json.load(f)
-
-    return state_dict
-
-#print(file_to_string(filename1))
 
 
 def clean_tokenize_regex(bill_text, lemm_bool = False):
@@ -92,8 +84,6 @@ def clean_tokenize_regex(bill_text, lemm_bool = False):
         return [lemmatizer.lemmatize(w) for w in list_clean_text]
     return list_clean_text
 
-    #print(lemmatizer.lemmatize("petroleum"), porter.stem("hydroelectric"))
-    #print(len(clean_tokenize_regex(file_to_string(filename1), True)))
 
 def count_dict_state(dict_bills, n, lemm_bool, mostcommon = None):
     list_ngrams = []
@@ -115,7 +105,7 @@ def state_word_cloud(dict_bills, n, filename, lemm_bool, mostcommon = None):
     wordcloud = WordCloud(width = 7000, 
                         height = 7000, 
                         background_color="white",
-                        contour_color='white',
+                        contour_color="black",
                         prefer_horizontal = 1.0,
                         mask = MASK).generate_from_frequencies(n_gram_dict)
     plt.imshow(wordcloud)
@@ -126,7 +116,6 @@ def state_word_cloud(dict_bills, n, filename, lemm_bool, mostcommon = None):
     return None
 
 def sliding_window_key_word(keyngrams, bill_text_lst, window_size):
-    
     count = 0
     leap = int(window_size/2)
     for i in range(0, len(bill_text_lst), leap):
@@ -156,26 +145,26 @@ def dict_energy_policy_index(keyngrams, dict_bills, window_size):
     return dict_list
 
 
-# def run_text_analysis():
-#     with open(TX_from) as f:
-#         texas_dict = json.load(f)
+def run_text_analysis():
+    with open(TX_from) as f:
+        texas_dict = json.load(f)
 
-#     with open(PA_from) as f:
-#         pennsylvania_dict = json.load(f)
+    with open(PA_from) as f:
+        pennsylvania_dict = json.load(f)
     
-#     # Unigrams
-#     state_word_cloud(texas_dict, 1, TX_to_word, True, 60)
-#     state_word_cloud(pennsylvania_dict, 1, PA_to_word, True, 60)
-#     # Bigrams
-#     state_word_cloud(texas_dict, 2, TX_to_bigram, True, 60)
-#     state_word_cloud(pennsylvania_dict, 2, PA_to_bigram, True, 60)
-#     # Tables
-#     TX_index_dict = dict_energy_policy_index(KEY_NGRAMS, texas_dict, 20)
-#     with open(TX_to_table, "w", encoding="utf-8") as nf:
-#         json.dump(TX_index_dict, nf)
+    # Unigrams
+    state_word_cloud(texas_dict, 1, TX_to_word, True, 60)
+    state_word_cloud(pennsylvania_dict, 1, PA_to_word, True, 60)
+    # Bigrams
+    state_word_cloud(texas_dict, 2, TX_to_bigram, True, 60)
+    state_word_cloud(pennsylvania_dict, 2, PA_to_bigram, True, 60)
+    # Tables
+    TX_index_dict = dict_energy_policy_index(KEY_NGRAMS, texas_dict, 20)
+    with open(TX_to_table, "w", encoding="utf-8") as nf:
+        json.dump(TX_index_dict, nf)
 
-#     PA_index_dict = dict_energy_policy_index(KEY_NGRAMS, pennsylvania_dict, 20)
-#     with open(PA_to_table, "w", encoding="utf-8") as nf:
-#         json.dump(PA_index_dict, nf)
+    PA_index_dict = dict_energy_policy_index(KEY_NGRAMS, pennsylvania_dict, 20)
+    with open(PA_to_table, "w", encoding="utf-8") as nf:
+        json.dump(PA_index_dict, nf)
 
-#     return None
+    return None
