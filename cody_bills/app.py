@@ -12,7 +12,7 @@ datatable_texas = pd.read_csv("cody_bills/assets/table_texas.txt").to_dict("reco
 app.layout = html.Div([
     # Dashboard Explanation
     html.Div([
-        html.H1("Energy Policy Text Analysis"),
+        html.H1("Energy Policy Text Analysis", style={'textAlign': 'center'}),
         html.P(""" 
             This dashboard presents graphs and a table that show the results of 
             the Energy Policy Index, calculated as a normalized frequency found
@@ -28,35 +28,30 @@ app.layout = html.Div([
 
     # Histograms
     html.Div([
-    html.Div([
-        html.H3("Histograms - Energy Policy Index"),
-        html.P("""
-        The histograms show the distribution of the Energy Policy
-        Index, for each state. 
-        
-        """),
-
-    html.Div([
-        html.Div(
-    dcc.Dropdown(
-        options = ["California and Texas", "California", "Texas"],
-        value = "California and Texas",
-        id = "histogram-dropdown",
-        # style={'width': '49%', 'display': 'inline-block'}
-        ),
-    ),
-    ]),
-    ]),
-
-    html.Div(
-        dcc.Graph(
-            id = "histogram-graph",
+        # html.Div([
+            html.H3("Histograms - Energy Policy Index"),
+            html.P("""
+            The histograms show the distribution of the Energy Policy
+            Index, for each state.
             
-        ),style={'width': '49%', 'display': 'inline-block'}
-    )
+            """,
+            style={'width': '70%'}),
+            dcc.Dropdown(
+                options = ["California and Texas", "California", "Texas"],
+                value = "California and Texas",
+                id = "histogram-dropdown"
+                # style={'width': '40%'}
+                ),
+                # ]),
+                # ], style={'width': '25%', 'display': 'inline-block', 'margin-bottom': '100'}),
+            
+        # html.Div(        
+            dcc.Graph(
+                id = "histogram-graph", style={'width': '70%'})
+                # id = "histogram-graph")], style={'width': '70%', 'display': 'inline-block'})
 
-# Closing parenthesis for histogram html
-]),
+    ]),
+
 
 # Tables
 html.Div([
@@ -113,14 +108,24 @@ html.Div([
 
 ]),
 html.Div([
-    html.Img(
-        style={'width': '40%', 'display': 'inline-block'},
-        id = "wordcloud-california"
-    ),
-    html.Img(
-        style={'width': '40%', 'display': 'inline-block'},
-        id = "wordcloud-texas"
-    )
+    html.Div([
+        html.H3("California", style={'textAlign': 'center'}),
+        html.Img(
+            style={'width': '100%', 'display': 'inline-block'},
+            id = "wordcloud-california",
+            title = "California"
+        )
+    
+    ], style={'display': 'inline-block'}),
+    html.Div([
+        html.H3("Texas", style={'textAlign': 'center'}),
+        html.Img(
+            style={'width': '100%', 'display': 'inline-block', },
+            id = "wordcloud-texas",
+            title = "Texas"
+
+        )
+        ], style={'display': 'inline-block'}),
 
 ])
 # closing parenthesis for wordcloud html
