@@ -1,4 +1,5 @@
 #### Libraries #####
+import json
 import re
 import string
 from collections import Counter
@@ -20,6 +21,11 @@ from nltk.util import ngrams
 
 #### Constants #####
 filename1 = "HB11_example.txt"
+
+with open("bills_pennsylvania.json") as f:
+    pennsylvania_dict = json.load(f)
+
+
 extra_stop_words = ["hb", "introduced", "page", "california", "texas"]
 stopwords_fix = stopwords.words("english") + extra_stop_words
 porter = PorterStemmer()
@@ -63,16 +69,18 @@ def clean_tokenize_regex(bill_text, lemm_bool = False):
     #print(lemmatizer.lemmatize("petroleum"), porter.stem("hydroelectric"))
     #print(len(clean_tokenize_regex(file_to_string(filename1), True)))
 
-def count_dict_state(list_bills, n, lemm_bool, mostcommon = None):
+def count_dict_state(dict_bills, n, lemm_bool, mostcommon = None):
     list_ngrams = []
-    for bill in list_bills:
-        clean_text = clean_tokenize_regex(bill["description"], lemm_bool)
+    for bill in dict_bills.values():
+        if "text" not in bill:
+            continue
+        clean_text = clean_tokenize_regex(bill["text"], lemm_bool)
         list_ngrams += list((ngrams(clean_text, n)))
 
     dict_1 = dict(Counter(list_ngrams).most_common(mostcommon))
     dict_1 = dict({((" ").join(key),val) for (key,val) in dict_1.items()})
     
-#return dict(sorted(dict_1.items(), key=lambda x:x[1], reverse = True))
+    return dict(sorted(dict_1.items(), key=lambda x:x[1], reverse = True))
     return dict_1
 
 
