@@ -7,9 +7,10 @@ import pandas as pd
 import numpy as np
 import networkx as nx
 from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
-import urllib.request
 from matplotlib import pyplot as plt
-import seaborn as sns
+#import plotly.express as px
+
+
 
 import nltk
 nltk.download("stopwords")
@@ -29,7 +30,9 @@ with open("bills_pennsylvania.json") as f:
 ### Stop Words
 extra_stop_words = ["hb", "introduced", "page", "pennsylvania", "texas", 
                     "illinois", "project", "bill", "id", "key", "assembly",
-                    "hereby", "allocation", "shall", "act"]
+                    "hereby", "allocation", "shall", "act", "state", "may",
+                    "section", "subsection", "subsections","commonwealth", 
+                    "general", "law","code", "person"]
 
 stopwords_fix = stopwords.words("english") + extra_stop_words
 porter = PorterStemmer()
@@ -57,8 +60,8 @@ MASK = 255 * MASK.astype(int)
 TX_from = "../pdf_links_texas.json"
 PA_from = "bills_pennsylvania.json"
 
-TX_to_table = "table_texas.txt"
-PA_to_table = "table_pennsylvania.txt"
+TX_to_table = "table_texas.json"
+PA_to_table = "table_pennsylvania.json"
 
 TX_to_word = "words_texas"
 PA_to_word = "words_pennsylvania"
@@ -126,7 +129,6 @@ def sliding_window_key_word(keyngrams, bill_text_lst, window_size):
     
     return (count/len(bill_text_lst))*100
 
-#print(sliding_window_key_word(key_ngrams_ex, list_tokens, 10))
 
 def dict_energy_policy_index(keyngrams, dict_bills, window_size):
     dict_list = []
@@ -144,6 +146,24 @@ def dict_energy_policy_index(keyngrams, dict_bills, window_size):
     
     return dict_list
 
+# def graph_histogram(state):
+#     list_int_1 = [random.randint(0, 101) for i in range(1000)]
+#     list_int_2 = [random.randint(0, 101) for i in range(1000)]
+#     list_state_1 = ["California" for i in range(1000)]
+#     list_state_2 = ["Texas" for i in range(1000)]
+
+#     if state == "California":
+#         fig = px.histogram(list_int_1)
+#     elif state == "Texas":
+#         fig = px.histogram(list_int_2)
+#     else:
+#         list_ints = list_int_1 + list_int_2
+#         list_states = list_state_1 + list_state_2
+#         df = pd.DataFrame({"state": list_states, "energy_index": list_ints})
+
+#         fig = px.histogram(df, x = "energy_index", color = "state", barmode = "overlay")
+
+    #return fig
 
 def run_text_analysis():
     with open(TX_from) as f:
