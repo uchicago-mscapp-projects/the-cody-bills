@@ -4,6 +4,7 @@ import re
 import string
 from collections import Counter
 import pandas as pd
+import numpy as np
 import networkx as nx
 from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
 import urllib.request
@@ -20,17 +21,22 @@ from nltk.util import ngrams
 
 
 #### Constants #####
-filename1 = "HB11_example.txt"
 
 with open("bills_pennsylvania.json") as f:
     pennsylvania_dict = json.load(f)
 
 
-extra_stop_words = ["hb", "introduced", "page", "california", "texas"]
+### Stop Words
+extra_stop_words = ["hb", "introduced", "page", "pennsylvania", "texas", 
+                    "illinois", "project", "bill", "id", "key", "assembly",
+                    "hereby", "allocation", "shall", "act"]
+
 stopwords_fix = stopwords.words("english") + extra_stop_words
 porter = PorterStemmer()
 lemmatizer = WordNetLemmatizer()
-key_ngrams_ex = [("advertising", "licensee"), ("board", ), ("regulation", ), ("electronic", "security")]
+
+# Energy policy related Key words or Ngrams to search for within the texts
+
 KEY_NGRAMS = [("energy",), ("fuel",), ("coal",), ("electric",), ("gas",), ("oil",), 
  ("petroleum",), ("nuclear",), ("renewable",), ("barrel",), ("battery",),
  ("diesel",), ("grid",), ("power",), ("reactor",), ("refinery",), 
@@ -41,11 +47,31 @@ KEY_NGRAMS = [("energy",), ("fuel",), ("coal",), ("electric",), ("gas",), ("oil"
  ("air",), ("wind",), ("capacity",), ("emission",), ("conservation",), 
  ("fume",), ("peak", "load"), ("kerosene",), ("clunker",)]
 
-def file_to_string(filename):
-    with open(filename) as file:
-        bill_string = file.read().replace('\n',' ')
+# Round Mask for Wordcloud
+x, y = np.ogrid[:300, :300]
+MASK = (x - 150) ** 2 + (y - 150) ** 2 > 130 ** 2
+MASK = 255 * MASK.astype(int)
 
-    return bill_string
+
+#### filenames ###
+TX_from = "Text_Preprocessing/"
+PA_from = "Text_Preprocessing/bills_pennsylvania.json"
+
+TX_to_table = "cody_bills/assets/table_texas.txt"
+PA_to_table = "cody_bills/assets/table_pennsylvania.txt"
+
+TX_to_word = "cody_bills/assets/words_texas.txt"
+PA_to_word = "cody_bills/assets/words_pennsylvania.txt"
+
+TX_to_bigram = "cody_bills/assets/bigrams_texas.txt"
+PA_to_bigram = "cody_bills/assets/bigrams_pennsylvania.txt"
+
+
+def file_to_dict(filename):
+    with open(filename) as f:
+        state_dict = json.load(f)
+
+    return state_dict
 
 #print(file_to_string(filename1))
 
@@ -81,20 +107,19 @@ def count_dict_state(dict_bills, n, lemm_bool, mostcommon = None):
     dict_1 = dict({((" ").join(key),val) for (key,val) in dict_1.items()})
     
     return dict(sorted(dict_1.items(), key=lambda x:x[1], reverse = True))
-    return dict_1
+    
 
 
-def state_word_cloud(lst_bills, n, filename, lemm_bool, mostcommon = None):
-    n_gram_dict = count_dict_state(lst_bills, n, lemm_bool, mostcommon)
-    #print(n_gram_dict)
-
-    wordcloud_CA = WordCloud(width = 1000, 
-                        height = 500, 
-                        background_color="black",
-                        colormap="Paired").generate_from_frequencies(n_gram_dict)
+def state_word_cloud(dict_bills, n, filename, lemm_bool, mostcommon = None):
+    n_gram_dict = count_dict_state(dict_bills, n, lemm_bool, mostcommon)
+    wordcloud = WordCloud(width = 7000, 
+                        height = 7000, 
+                        background_color="white",
+                        contour_color='white',
+                        prefer_horizontal = 1.0,
+                        mask = MASK).generate_from_frequencies(n_gram_dict)
     plt.imshow(wordcloud)
     plt.axis("off")
-    plt.show()
     plt.savefig(filename+".png", bbox_inches='tight')
     plt.close()
 
@@ -110,16 +135,24 @@ def sliding_window_key_word(keyngrams, bill_text_lst, window_size):
             if set(kngram).issubset(window):
                 count += 1
     
-    return count/len(bill_text_lst)
+    return (count/len(bill_text_lst))*100
 
 #print(sliding_window_key_word(key_ngrams_ex, list_tokens, 10))
 
-def dict_energy_policy_index(keyngrams, list_bills, window_size):
-    dict = {} 
-    for bill in list_bills: 
-        cleaned_text_lst = bill["description"]
-        dict[bill["id"]] = sliding_window_key_word(keyngrams, 
+def dict_energy_policy_index(keyngrams, dict_bills, window_size):
+    dict_list = []
+    for bill in dict_bills.values():
+        if "text" not in bill:
+            continue
+        d = {}
+        d["Bill_id"] = bill["id"]
+        d["Description"] = bill["title"]
+        cleaned_text_lst = clean_tokenize_regex(bill["text"], True)
+        d["Energy Policy Index"] = sliding_window_key_word(keyngrams, 
                                                    cleaned_text_lst,
                                                    window_size)
+        dict_list.append(d)
     
-    return None
+    return dict_list
+
+
