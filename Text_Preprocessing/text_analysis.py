@@ -54,17 +54,17 @@ MASK = 255 * MASK.astype(int)
 
 
 #### filenames ###
-TX_from = "Text_Preprocessing/"
-PA_from = "Text_Preprocessing/bills_pennsylvania.json"
+# TX_from = "Text_Preprocessing/"
+# PA_from = "Text_Preprocessing/bills_pennsylvania.json"
 
-TX_to_table = "cody_bills/assets/table_texas.txt"
-PA_to_table = "cody_bills/assets/table_pennsylvania.txt"
+# TX_to_table = "cody_bills/assets/table_texas.txt"
+# PA_to_table = "cody_bills/assets/table_pennsylvania.txt"
 
-TX_to_word = "cody_bills/assets/words_texas.txt"
-PA_to_word = "cody_bills/assets/words_pennsylvania.txt"
+# TX_to_word = "cody_bills/assets/words_texas"
+# PA_to_word = "cody_bills/assets/words_pennsylvania"
 
-TX_to_bigram = "cody_bills/assets/bigrams_texas.txt"
-PA_to_bigram = "cody_bills/assets/bigrams_pennsylvania.txt"
+# TX_to_bigram = "cody_bills/assets/bigrams_texas"
+# PA_to_bigram = "cody_bills/assets/bigrams_pennsylvania"
 
 
 def file_to_dict(filename):
@@ -156,3 +156,26 @@ def dict_energy_policy_index(keyngrams, dict_bills, window_size):
     return dict_list
 
 
+# def run_text_analysis():
+#     with open(TX_from) as f:
+#         texas_dict = json.load(f)
+
+#     with open(PA_from) as f:
+#         pennsylvania_dict = json.load(f)
+    
+#     # Unigrams
+#     state_word_cloud(texas_dict, 1, TX_to_word, True, 60)
+#     state_word_cloud(pennsylvania_dict, 1, PA_to_word, True, 60)
+#     # Bigrams
+#     state_word_cloud(texas_dict, 2, TX_to_bigram, True, 60)
+#     state_word_cloud(pennsylvania_dict, 2, PA_to_bigram, True, 60)
+#     # Tables
+#     TX_index_dict = dict_energy_policy_index(KEY_NGRAMS, texas_dict, 20)
+#     with open(TX_to_table, "w", encoding="utf-8") as nf:
+#         json.dump(TX_index_dict, nf)
+
+#     PA_index_dict = dict_energy_policy_index(KEY_NGRAMS, pennsylvania_dict, 20)
+#     with open(PA_to_table, "w", encoding="utf-8") as nf:
+#         json.dump(PA_index_dict, nf)
+
+#     return None
