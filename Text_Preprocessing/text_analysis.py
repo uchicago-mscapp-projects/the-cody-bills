@@ -32,7 +32,7 @@ extra_stop_words = ["hb", "introduced", "page", "pennsylvania", "texas",
                     "illinois", "project", "bill", "id", "key", "assembly",
                     "hereby", "allocation", "shall", "act", "state", "may",
                     "section", "subsection", "subsections","commonwealth", 
-                    "general", "law","code", "person"]
+                    "general", "law","code", "person", "chapter", "chapters"]
 
 stopwords_fix = stopwords.words("english") + extra_stop_words
 porter = PorterStemmer()
@@ -136,12 +136,15 @@ def dict_energy_policy_index(keyngrams, dict_bills, window_size):
         if "text" not in bill:
             continue
         d = {}
-        d["Bill_id"] = bill["id"]
+        d["Bill ID"] = bill["id"]
         d["Description"] = bill["title"]
+        d["Chamber"] = bill["chamber"]
+        d["Created date"] = bill["created_date"] 
         cleaned_text_lst = clean_tokenize_regex(bill["text"], True)
         d["Energy Policy Index"] = sliding_window_key_word(keyngrams, 
                                                    cleaned_text_lst,
                                                    window_size)
+        d["url"] = bill["link"]
         dict_list.append(d)
     
     return dict_list
