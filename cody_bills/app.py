@@ -1,18 +1,23 @@
+import json
 import random
 import base64
 import pandas as pd
 import plotly.express as px
+import dash_bootstrap_components as dbc
 from dash import Dash, html, dcc, Input, Output, get_asset_url, dash_table
 
-app = Dash(__name__)
+with open("cody_bills/assets/table_pennsylvania.json", "r") as file:
+    datatable_pennsylvania = json.load(file)
 
-datatable_california = pd.read_csv("cody_bills/assets/table_california.txt").to_dict("records")
-datatable_texas = pd.read_csv("cody_bills/assets/table_texas.txt").to_dict("records")
-
+with open("cody_bills/assets/table_texas.json", "r") as file:
+    datatable_texas = json.load(file)
+# SPACELAB
+app = Dash(external_stylesheets=[dbc.themes.SIMPLEX])
 app.layout = html.Div([
     # Dashboard Explanation
     html.Div([
-        html.H1("Energy Policy Text Analysis", style={'textAlign': 'center'}),
+
+        html.H1("Energy Policy Text Analysis", style = {'textAlign': 'center'}),
         html.P(""" 
             This dashboard presents graphs and a table that show the results of 
             the Energy Policy Index, calculated as a normalized frequency found
@@ -26,127 +31,136 @@ app.layout = html.Div([
 
     ]),
 
-    # Histograms
-    html.Div([
-        # html.Div([
-            html.H3("Histograms - Energy Policy Index"),
-            html.P("""
-            The histograms show the distribution of the Energy Policy
-            Index, for each state.
+    dbc.Card(
+        dbc.CardBody([
+            dbc.Row([
+                dbc.Col([
+
+                    html.H3("Histograms - Energy Policy Index", style = {'textAlign': 'center'}),
+
+                    dcc.Dropdown(
+                        options = ["Pennsylvania", "Texas"],
+                        value = "Pennsylvania",
+                        id = "histogram-dropdown",
+                        style={'width': '100%'}
+                    ),
+
+                    html.P("""
+                        The histograms show the distribution of the Energy Policy
+                        Index, for each state.
+                    
+                    """, style = {'textAlign': 'center'}),
+                ], width = 4),
+
+                dbc.Col([
+                    dcc.Graph(
+                        id = "histogram-graph")
+                        # id = "histogram-graph")], style={'width': '70%', 'display': 'inline-block'})
+                    
+                ], width=8)
+            ], align='center'),
             
-            """,
-            style={'width': '70%'}),
-            dcc.Dropdown(
-                options = ["California and Texas", "California", "Texas"],
-                value = "California and Texas",
-                id = "histogram-dropdown"
-                # style={'width': '40%'}
-                ),
-                # ]),
-                # ], style={'width': '25%', 'display': 'inline-block', 'margin-bottom': '100'}),
-            
-        # html.Div(        
-            dcc.Graph(
-                id = "histogram-graph", style={'width': '70%'})
-                # id = "histogram-graph")], style={'width': '70%', 'display': 'inline-block'})
+            dbc.Row([
+                dbc.Col([
+                    html.H3("Tables - Bills Metadata and Index", style = {'textAlign': 'center'}),
 
-    ]),
+                    html.Div([
+                        dcc.Dropdown(
+                            options = ["Pennsylvania", "Texas"],
+                            value = "Pennsylvania",
+                            id = "table-dropdown",
+                            style = {'width': '100%'}
+                        )
 
+                    ]),
 
-# Tables
-html.Div([
-    html.Div([
-        html.H3("Tables - Bills Metadata and Index"),
-        html.P("""
-        The tables show the name of each bill, the description and 
-        the Energy Policy Index. It is sorted by the index from 
-        greater to lowest. 
-        """),
-    ]),
+                    html.P("""
+                    The tables show the name of each bill, the description and 
+                    the Energy Policy Index. It is sorted by the index from 
+                    greater to lowest. 
+                    """, style = {'textAlign': 'center'}),
+                ], width = 4),
+                # Column of table
+                dbc.Col([
+                        dash_table.DataTable( 
+                        id = "data-table",
+                        page_size = 30,
+                        fixed_rows = {'headers': True},
+                        # filter_action='native',
+                        # style_data = {'minWidth': '180px', 'width': '180px', 'maxWidth': '180px', 'height': 'auto', 'overflowY': 'auto'} ,
+                        # style_table = {'width': '75%', 'height': '300px', 'overflowY': 'auto'})
+                    )
+                    
+                ], width = 8)
+            ], align='center'),
 
-    html.Div([
-        dcc.Dropdown(
-            options = ["California", "Texas"],
-            value = "California",
-            id = "table-dropdown",
-            style={'width': '50%', 'display': 'inline-block'}
-        )
+            dbc.Row([
+                dbc.Col([
+                    html.Div([
+                        html.H3("Word Clouds by State"),
 
-    ]),
+                    dcc.Dropdown(
+                        options = ["Words", "Bigrams"],
+                        value = "Words",
+                        id = "wordcloud-dropdown",
+                        style={'width': '100%'}
+                    ),
+                        html.P("""
+                        The clouds present the frequency of words and bigrams of the totality of bills
+                        inside a state. The bigger the gram, the more frequent it is in the bills.  
+                        """)
 
-    html.Div([
-        dash_table.DataTable( 
-        id = "data-table",
-        page_size = 30,
-        fixed_rows={'headers': True},
-        # filter_action='native',
-        style_table={'width': '75%', 'height': '300px', 'overflowY': 'auto'})
-       
-])
+                    ]),
 
-# Closing parenthesis for table html
-]),
+                ], width=4),
+                dbc.Col([
+                    html.H3("Pennsylvania", style={'textAlign': 'center'}),
+                    html.Img(
+                        style={'width': '100%', 'display': 'inline-block'},
+                        id = "wordcloud-pennsylvania",
+                        title = "Pennsylvania"
+                        )], width=4),
 
-# Wordclouds
-html.Div([
-    html.Div([
-        html.H3("Word Clouds by State"),
-        html.P("""
-        The clouds present the frequency of words and bigrams of the totality of bills
-        inside a state. The bigger the gram, the more frequent it is in the bills.  
-        """)
+                dbc.Col([
+                    html.H3("Texas", style={'textAlign': 'center'}),
+                    html.Img(
+                        style={'width': '100%', 'display': 'inline-block', },
+                        id = "wordcloud-texas",
+                        title = "Texas"
+                    )
+                ], width=4)
 
-    ]),
-
-    html.Div([
-    dcc.Dropdown(
-        options = ["Words", "Bigrams"],
-        value = "Words",
-        id = "wordcloud-dropdown",
-        style={'width': '50%', 'display': 'inline-block'}
-    )
-
-]),
-html.Div([
-    html.Div([
-        html.H3("California", style={'textAlign': 'center'}),
-        html.Img(
-            style={'width': '100%', 'display': 'inline-block'},
-            id = "wordcloud-california",
-            title = "California"
-        )
-    
-    ], style={'display': 'inline-block'}),
-    html.Div([
-        html.H3("Texas", style={'textAlign': 'center'}),
-        html.Img(
-            style={'width': '100%', 'display': 'inline-block', },
-            id = "wordcloud-texas",
-            title = "Texas"
-
-        )
-        ], style={'display': 'inline-block'}),
-
-])
-# closing parenthesis for wordcloud html
-]),
-
-# Bargraphs
-html.Div([
-    html.Div([
-    dcc.Dropdown(
-        options = ["Total Carbon Dioxide Emissions", "Total Energy Consumed Per Capita", "Total Energy Expenditure Per Capita", "Total Energy Production"],
-        value = "Total Carbon Dioxide Emissions",
-        id = "barplot-dropdown",
-        style={'width': '50%', 'display': 'inline-block'}
-        )
+            ], align='center'),
         
-    ])
-# Closing parenthesis for bargraphs
+            dbc.Row([
+                dbc.Col([
+                    html.H3("Energy and CO2 Emission Barcharts", style = {'textAlign': 'center'}),
+                    dcc.Dropdown(
+                        options = ["Total Energy - Total Carbon Dioxide", "Energy Consumed - Energy Expenditure"],
+                        value = "Total Energy - Total Carbon Dioxide",
+                        id = "barchart-dropdown",
+                        style={'width': '100%'}
+                        )
+
+                ], width=4),
+
+                dbc.Col([
+                    dcc.Graph(
+                        id = "barchart-graph-totals")], 
+                        width=4),
+
+                dbc.Col([
+                    dcc.Graph(
+                        id = "histogram-graph-percapita")], 
+                        width=4),
+
+            ], align='center')
+
+
+        ])
+    ),
 ])
 
-# Closing parenthesis for whole layout
-])
 
 
 @app.callback(
@@ -156,10 +170,10 @@ html.Div([
 def graph_histogram(state):
     list_int_1 = [random.randint(0, 101) for i in range(1000)]
     list_int_2 = [random.randint(0, 101) for i in range(1000)]
-    list_state_1 = ["California" for i in range(1000)]
+    list_state_1 = ["Pennsylvania" for i in range(1000)]
     list_state_2 = ["Texas" for i in range(1000)]
 
-    if state == "California":
+    if state == "Pennsylvania":
         fig = px.histogram(list_int_1)
     elif state == "Texas":
         fig = px.histogram(list_int_2)
@@ -172,31 +186,29 @@ def graph_histogram(state):
 
     return fig
 
-
 @app.callback(
     Output(component_id = "data-table", component_property = "data"),
     Input(component_id = "table-dropdown", component_property = "value")
 )
 def create_table(state):
-    if state == "California":
-        datatable = datatable_california
+    if state == "Pennsylvania":
+        datatable = datatable_pennsylvania
     else:
         datatable = datatable_texas
     
     return datatable
 
-
 @app.callback(
-    Output(component_id = "wordcloud-california", component_property = "src"),
+    Output(component_id = "wordcloud-pennsylvania", component_property = "src"),
     Input(component_id = "wordcloud-dropdown", component_property = "value")
 )
-def display_wordclouds_california(ngram_type):
+def display_wordclouds_pennsylvania(ngram_type):
     if ngram_type == "Words":
-        image_path_california = "cody_bills/assets/words_california.png"
+        image_path_pennsylvania = "cody_bills/assets/words_pennsylvania.png"
     else:
-        image_path_california = "cody_bills/assets/bigrams_california.png"
+        image_path_pennsylvania = "cody_bills/assets/bigrams_pennsylvania.png"
        
-    encoded_image = base64.b64encode(open(image_path_california, 'rb').read())
+    encoded_image = base64.b64encode(open(image_path_pennsylvania, 'rb').read())
 
     return 'data:image/png;base64,{}'.format(encoded_image.decode())
 
@@ -214,9 +226,15 @@ def display_wordclouds_texas(ngram_type):
 
     return 'data:image/png;base64,{}'.format(encoded_image.decode())
 
+# @app.callback(
+#     Output(component_id = "barchart-graph-totals", component_property = "figure"),
+#     Input(component_id = "barchart-dropdown", component_property = "value")
+# )
+# def graph_barchart(subjects):
+    
 
-if __name__ == '__main__':
-    app.run_server(debug=True)
 
-## Source on how to display images on Dash dashboard
-# https://community.plotly.com/t/how-to-embed-images-into-a-dash-app/61839
+app.run_server()
+
+# poetry add -dev (wordcloud, preprocessing, etc.)
+
