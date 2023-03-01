@@ -180,7 +180,7 @@ def append_and_normalize_index(dict_lst_TX, dict_lst_PA):
     df_both_states["Norm_EPol_Index"] = ((df_both_states["Energy Policy Index"] - min_epol_index)/
                                         (max_epol_index - min_epol_index))
     texas_norm_list = df_both_states.loc[df_both_states["State"] == "Texas"].to_dict("records")
-    pennsylvania_norm_list = df_both_states.loc[df_both_states["State"] == "Texas"].to_dict("records")
+    pennsylvania_norm_list = df_both_states.loc[df_both_states["State"] == "Pennsylvania"].to_dict("records")
 
     return (df_both_states, pennsylvania_norm_list, texas_norm_list)
 
@@ -220,13 +220,14 @@ def run_norm_index_tables():
     # normalized Tables
     TX_index_dict = dict_energy_policy_index(KEY_NGRAMS, texas_dict, 20)
     PA_index_dict = dict_energy_policy_index(KEY_NGRAMS, pennsylvania_dict, 20)
-    _, texas_norm, pennsylvania_norm = append_and_normalize_index(TX_index_dict, 
+    _, pennsylvania_norm, texas_norm = append_and_normalize_index(TX_index_dict, 
                                                                   PA_index_dict)
-    with open(TX_to_table, "w", encoding="utf-8") as nf:
-        json.dump(texas_norm, nf, indent=1)
 
     with open(PA_to_table, "w", encoding="utf-8") as nf:
         json.dump(pennsylvania_norm, nf, indent=1)
+    
+    with open(TX_to_table, "w", encoding="utf-8") as nf:
+        json.dump(texas_norm, nf, indent=1)
 
 
     return None
