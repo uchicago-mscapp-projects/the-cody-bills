@@ -8,7 +8,7 @@ import numpy as np
 import networkx as nx
 from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
 from matplotlib import pyplot as plt
-#import plotly.express as px
+import plotly.express as px
 
 
 
@@ -29,10 +29,14 @@ with open("bills_pennsylvania.json") as f:
 
 ### Stop Words
 extra_stop_words = ["hb", "introduced", "page", "pennsylvania", "texas", 
-                    "illinois", "project", "bill", "id", "key", "assembly",
-                    "hereby", "allocation", "shall", "act", "state", "may",
-                    "section", "subsection", "subsections","commonwealth", 
-                    "general", "law","code", "person", "chapter", "chapters"]
+                    "illinois", "project", "bill", "bills", "id", "key", "assembly",
+                    "hereby", "allocation", "shall", "act", "state", "states",
+                    "may","section", "subsection", "sections", "subsections",
+                    "commonwealth", "general", "law","code", "person", "chapter", 
+                    "chapters", "contingency", "contingencies", "read", "amended", "take", "takes" 
+                    "legislature", "enacted", "date", "version","text","follows", "government", "take",
+                    "effect", "year","years", "district", "districts", "department", "departments",
+                    "thesame", "topic", "see"]
 
 stopwords_fix = stopwords.words("english") + extra_stop_words
 porter = PorterStemmer()
@@ -72,6 +76,14 @@ PA_to_bigram = "bigrams_pennsylvania"
 
 
 def clean_tokenize_regex(bill_text, lemm_bool = False):
+    """
+    Takes the extracted text of the bills (string) and cleans it removing
+    punctuation, digits, single characters, etc. The function tokenizes
+    the strings and optionally lemmatize them to ease the analysis.
+    Inputs: bill_text: text of the bill (str)
+            lemm_bool: lemmatizes the tokens if True (bool)
+    Returns: list of cleaned lowercased, (lemmatized) tokens
+    """
 
     cleaned_text = re.sub(r'[^\w\s]', "", bill_text) # punctuation
     cleaned_text = re.sub(r'[0-9]',"", cleaned_text) # digits
@@ -84,11 +96,18 @@ def clean_tokenize_regex(bill_text, lemm_bool = False):
     cleaned_text = remove_this.sub("", cleaned_text)
     list_clean_text = cleaned_text.split()
     if lemm_bool == True:
-        return [lemmatizer.lemmatize(w) for w in list_clean_text]
+        return [lemmatizer.lemmatize(w) for w in list_clean_text if len(w)>2]
     return list_clean_text
 
 
 def count_dict_state(dict_bills, n, lemm_bool, mostcommon = None):
+    """
+    Creates a dictionary that maps an ngram to the number of times it appears 
+    in a set of bills. 
+    Inputs: dict_bills: nested dictionary that contains all the extracted 
+                        bills of a given state with the information of the bills
+    
+    """
     list_ngrams = []
     for bill in dict_bills.values():
         if "text" not in bill:
@@ -120,7 +139,7 @@ def state_word_cloud(dict_bills, n, filename, lemm_bool, mostcommon = None):
 
 def sliding_window_key_word(keyngrams, bill_text_lst, window_size):
     count = 0
-    leap = int(window_size/2)
+    leap = window_size//4
     for i in range(0, len(bill_text_lst), leap):
         window = bill_text_lst[i:i+window_size]
         for kngram in keyngrams:
@@ -144,31 +163,39 @@ def dict_energy_policy_index(keyngrams, dict_bills, window_size):
         d["Energy Policy Index"] = sliding_window_key_word(keyngrams, 
                                                    cleaned_text_lst,
                                                    window_size)
+        d["State"] = bill["state"]
         d["url"] = bill["link"]
         dict_list.append(d)
     
     return dict_list
 
-# def graph_histogram(state):
-#     list_int_1 = [random.randint(0, 101) for i in range(1000)]
-#     list_int_2 = [random.randint(0, 101) for i in range(1000)]
-#     list_state_1 = ["California" for i in range(1000)]
-#     list_state_2 = ["Texas" for i in range(1000)]
+def append_and_normalize_index(dict_lst_TX, dict_lst_PA):
 
-#     if state == "California":
-#         fig = px.histogram(list_int_1)
-#     elif state == "Texas":
-#         fig = px.histogram(list_int_2)
-#     else:
-#         list_ints = list_int_1 + list_int_2
-#         list_states = list_state_1 + list_state_2
-#         df = pd.DataFrame({"state": list_states, "energy_index": list_ints})
+    df_TX = pd.DataFrame.from_dict(dict_lst_TX, orient='columns')
+    df_PA = pd.DataFrame.from_dict(dict_lst_PA, orient='columns')
+    df_both_states = pd.concat([df_PA,df_TX])
+    #df_both_states.groupby('State').describe()
+    min_epol_index = min(df_both_states["Energy Policy Index"])
+    max_epol_index = max(df_both_states["Energy Policy Index"])
+    df_both_states["Norm_EPol_Index"] = ((df_both_states["Energy Policy Index"] - min_epol_index)/
+                                        (max_epol_index - min_epol_index))
+    texas_norm_list = df_both_states.loc[df_both_states["State"] == "Texas"].to_dict("records")
+    pennsylvania_norm_list = df_both_states.loc[df_both_states["State"] == "Texas"].to_dict("records")
 
-#         fig = px.histogram(df, x = "energy_index", color = "state", barmode = "overlay")
+    return (df_both_states, pennsylvania_norm_list, texas_norm_list)
 
-    #return fig
+def get_histogram(dict_lst_TX, dict_lst_PA):
+    database_norm, _, _ = append_and_normalize_index(dict_lst_TX, dict_lst_PA)
+    fig = px.histogram(database_norm, x = "Norm_EPol_Index", 
+                       color = "State", 
+                       barmode = "overlay")
+    
+    #return None
+    return fig
 
-def run_text_analysis():
+
+
+def run_word_clouds():
     with open(TX_from) as f:
         texas_dict = json.load(f)
 
@@ -181,13 +208,25 @@ def run_text_analysis():
     # Bigrams
     state_word_cloud(texas_dict, 2, TX_to_bigram, True, 60)
     state_word_cloud(pennsylvania_dict, 2, PA_to_bigram, True, 60)
-    # Tables
-    TX_index_dict = dict_energy_policy_index(KEY_NGRAMS, texas_dict, 20)
-    with open(TX_to_table, "w", encoding="utf-8") as nf:
-        json.dump(TX_index_dict, nf)
+    
 
+def run_norm_index_tables():
+    with open(TX_from) as f:
+        texas_dict = json.load(f)
+
+    with open(PA_from) as f:
+        pennsylvania_dict = json.load(f)
+    
+    # normalized Tables
+    TX_index_dict = dict_energy_policy_index(KEY_NGRAMS, texas_dict, 20)
     PA_index_dict = dict_energy_policy_index(KEY_NGRAMS, pennsylvania_dict, 20)
+    _, texas_norm, pennsylvania_norm = append_and_normalize_index(TX_index_dict, 
+                                                                  PA_index_dict)
+    with open(TX_to_table, "w", encoding="utf-8") as nf:
+        json.dump(texas_norm, nf, indent=1)
+
     with open(PA_to_table, "w", encoding="utf-8") as nf:
-        json.dump(PA_index_dict, nf)
+        json.dump(pennsylvania_norm, nf, indent=1)
+
 
     return None
