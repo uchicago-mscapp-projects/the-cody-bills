@@ -1,16 +1,17 @@
 import pandas as pd
-# import matplotlib.pyplot as plt
-# import seaborn as sns
-# import numpy as np
 import pytest
+from energy_states.energy_dataviz import consumed_graph, emissions_graph
+from energy_states.energy_dataviz import expenditures_graph, production_graph
 
+def test_consumed_graph():
+    graph = consumed_graph()
 
-from energy_states.eia_clean import clean_emissions_data, clean_consumed_data 
-from energy_states.eia_clean import clean_expenditures_data,  clean_production_data
-from energy_states.energy_dataviz import create_graph
+def test_emissions_graph():
+    graph = emissions_graph()
 
-def test_graph():
-    graph = create_graph()
+def test_expenditures_graph():
+    graph = expenditures_graph()
     
-    assert graph
-    
+def test_production_graph():
+    graph = production_graph()
+

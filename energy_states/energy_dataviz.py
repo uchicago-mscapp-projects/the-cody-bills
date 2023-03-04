@@ -5,6 +5,10 @@ import plotly.express as px
 
 def consumed_graph():
     """
+    Description
+    
+    Returns:
+
     """
     title_section = "<b>Energy Consumed by Pennsylvania & Texas</b>"
     
@@ -17,6 +21,10 @@ def consumed_graph():
 
 def emissions_graph():
     """
+    Description
+    
+    Returns:
+        
     """
     title_section =  "<b>Carbon Dioxide Emissions from Pennsylvania & Texas</b>"
     
@@ -29,11 +37,15 @@ def emissions_graph():
 
 def expenditures_graph():
     """
+    Description
+    
+    Returns:
+        
     """
     title_section = "<b>Energy Expenditures for Pennsylvania & Texas</b>"
     
-    bar_graph = (clean_expenditures_data(), clean_expenditures_data().columns[3]
-            , clean_expenditures_data().columns[2], title_section
+    bar_graph = (clean_expenditures_data(), clean_expenditures_data().columns[2]
+            , clean_expenditures_data().columns[3], title_section
 )
     
     return bar_graph
@@ -41,11 +53,15 @@ def expenditures_graph():
 
 def production_graph():
     """
+    Description
+    
+    Returns:
+        
     """
     title_section = "<b>Energy Production by Pennsylvania & Texas</b>"
     
-    bar_graph = (clean_production_data(), clean_production_data().columns[2], 
-            clean_production_data().columns[3], title_section
+    bar_graph = (clean_production_data(), clean_production_data().columns[3], 
+            clean_production_data().columns[2], title_section
 )
     
     return bar_graph
@@ -53,6 +69,16 @@ def production_graph():
 
 def create_graph(data, y_variable, added_hover_variable, title_section):
     """
+    Description
+    
+    Input:
+        data:
+        y_variable:
+        added_hover_variable:
+        title_section:
+    
+    Returns:
+        
     """
     fig = px.bar(data, x = "State", y = y_variable, text = "Rank",  
             color = "State", color_discrete_sequence = ["mediumpurple", "red"], 
