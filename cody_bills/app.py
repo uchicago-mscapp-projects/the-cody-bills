@@ -84,10 +84,11 @@ app.layout = html.Div([
                 dbc.Col([
                         dash_table.DataTable( 
                         id = "data-table",
-                        page_size = 30,
+                        page_size = 15,
                         fixed_rows = {'headers': True},
-                        # filter_action='native',
-                        # style_data = {'minWidth': '180px', 'width': '180px', 'maxWidth': '180px', 'height': 'auto', 'overflowY': 'auto'} ,
+                        # filter_action='native'
+                        style_cell={"whiteSpace": "pre-line"},
+                        style_data = {'minWidth': '150px', 'width': '180px', 'maxWidth': '230px', 'height': 'auto', 'overflowY': 'auto'} ,
                         # style_table = {'width': '75%', 'height': '300px', 'overflowY': 'auto'})
                     )
                     
@@ -217,6 +218,9 @@ def display_wordclouds_pennsylvania(ngram_type):
     Input(component_id = "wordcloud-dropdown", component_property = "value")
 )
 def display_wordclouds_texas(ngram_type):
+    """
+    Docstring
+    """
     if ngram_type == "Words":
         image_path_texas = "cody_bills/assets/words_texas.png"
     else:
@@ -238,3 +242,5 @@ app.run_server()
 
 # poetry add -dev (wordcloud, preprocessing, etc.)
 
+
+# , style = {'height': '100vh', 'justify-content': 'center', 'align-items': 'center'}
