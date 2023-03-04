@@ -10,8 +10,6 @@ from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
 from matplotlib import pyplot as plt
 import plotly.express as px
 
-
-
 import nltk
 nltk.download("stopwords")
 nltk.download('wordnet')
@@ -23,8 +21,8 @@ from nltk.util import ngrams
 
 #### Constants #####
 
-with open("bills_pennsylvania.json") as f:
-    pennsylvania_dict = json.load(f)
+# with open("bills_pennsylvania.json") as f:
+#     pennsylvania_dict = json.load(f)
 
 
 ### Stop Words
@@ -106,7 +104,11 @@ def count_dict_state(dict_bills, n, lemm_bool, mostcommon = None):
     in a set of bills. 
     Inputs: dict_bills: nested dictionary that contains all the extracted 
                         bills of a given state with the information of the bills
-    
+            n: integer that represents the number of words we want the ngrams to have
+            lemm_bool: lemmatizes the tokens if True (bool)
+            mostcommon: the top mostcommon ngrams we want the dictionary to show (int)
+    Returns: Dictionary that maps each kgram found in the set of bills of the state
+             to the number of times it appears in the whole corpus
     """
     list_ngrams = []
     for bill in dict_bills.values():
@@ -123,6 +125,17 @@ def count_dict_state(dict_bills, n, lemm_bool, mostcommon = None):
 
 
 def state_word_cloud(dict_bills, n, filename, lemm_bool, mostcommon = None):
+    """
+    Plots a wordcloud of the most common ngrams from the scraped dictionary of bills.  
+    Inputs: dict_bills: nested dictionary that contains all the extracted 
+                        bills of a given state with the information of the bills
+            n: integer that represents the number of words we want the ngrams to have
+            filename: the name of the filename or path we will save the word cloud plot in.
+            lemm_bool: lemmatizes the tokens if True (bool)
+            mostcommon: the top mostcommon ngrams we want the dictionary to show (int)
+    Returns: None. Saves the wordcloud plot in the specified filename
+    """
+
     n_gram_dict = count_dict_state(dict_bills, n, lemm_bool, mostcommon)
     wordcloud = WordCloud(width = 7000, 
                         height = 7000, 
@@ -138,6 +151,21 @@ def state_word_cloud(dict_bills, n, filename, lemm_bool, mostcommon = None):
     return None
 
 def sliding_window_key_word(keyngrams, bill_text_lst, window_size):
+    """
+    From the tokenized text of a bill (list), returns an indicator calculated
+    following a sliding window algorithm. The algorithm takes a slice of 
+    the list of tokens of a given size (window_size) and searches for the elements
+    of a list of key-ngrams in the window. Each time a key-ngram appears in the window
+    the count augments in 1. The window leaps in a fourth of its size 
+    (arbitrarily chose that size but can easily be changed), and repeat the process. 
+    The final count is divided by the number of tokens in the bill. 
+    Inputs: keyngrams: list of key-ngrams related to energy policy (list of tuples)
+            bill_text_lst: list of the tokens that make up the text of a bill
+            window_size: integer that represents the size of the slice.
+    Returns: A float that is the ratio between the final count and the length of the bill times
+             100. In this case it is the Energy policy index
+    """
+
     count = 0
     leap = window_size//4
     for i in range(0, len(bill_text_lst), leap):
@@ -150,6 +178,16 @@ def sliding_window_key_word(keyngrams, bill_text_lst, window_size):
 
 
 def dict_energy_policy_index(keyngrams, dict_bills, window_size):
+    """
+    From a scraped dictionary of bills, change the name of some keys and 
+    creates a whose value is the score given when searching for the keywords using 
+    the sliding window method, the Energy Policy Index in oru case.
+    Inputs: keyngrams: list of key-ngrams related to energy policy (list of tuples)
+            dict_bills: nested dictionary that contains all the extracted 
+                        bills of a given state with the information of the bills
+            window_size: integer that represents the size of the slice.
+    """
+
     dict_list = []
     for bill in dict_bills.values():
         if "text" not in bill:
@@ -170,6 +208,15 @@ def dict_energy_policy_index(keyngrams, dict_bills, window_size):
     return dict_list
 
 def append_and_normalize_index(dict_lst_TX, dict_lst_PA):
+    """
+    Takes the dictionaries of Texas and Pennsylvania that have the Energy Policy Index
+    append them, normalize the index between 1 and 0 and divide the database into two 
+    lists of dictionaries again. 
+    Inputs: dict_lst_TX, dict_lst_PA: lists of dictionaries with non-normalized 
+                                      energy policy index
+    Returns: Tuple with the complete (2-state) dataframe, and each state's list
+             of dictionaries updated with the normalized index. 
+    """
 
     df_TX = pd.DataFrame.from_dict(dict_lst_TX, orient='columns')
     df_PA = pd.DataFrame.from_dict(dict_lst_PA, orient='columns')
@@ -177,14 +224,22 @@ def append_and_normalize_index(dict_lst_TX, dict_lst_PA):
     #df_both_states.groupby('State').describe()
     min_epol_index = min(df_both_states["Energy Policy Index"])
     max_epol_index = max(df_both_states["Energy Policy Index"])
-    df_both_states["Norm_EPol_Index"] = ((df_both_states["Energy Policy Index"] - min_epol_index)/
-                                        (max_epol_index - min_epol_index))
-    texas_norm_list = df_both_states.loc[df_both_states["State"] == "Texas"].to_dict("records")
-    pennsylvania_norm_list = df_both_states.loc[df_both_states["State"] == "Pennsylvania"].to_dict("records")
+    df_both_states["Norm_EPol_Index"] = ((df_both_states["Energy Policy Index"] - 
+                                          min_epol_index)/(max_epol_index - min_epol_index))
+    texas_norm_list = df_both_states.loc[df_both_states["State"] == \
+                                         "Texas"].to_dict("records")
+    pennsylvania_norm_list = \
+                            df_both_states.loc[df_both_states["State"] == \
+                            "Pennsylvania"].to_dict("records")
 
     return (df_both_states, pennsylvania_norm_list, texas_norm_list)
 
 def get_histogram(dict_lst_TX, dict_lst_PA):
+    """
+    Generates a histogram for each state following the distribution of the Normalized Energy
+    Policy Index
+    
+    """
     database_norm, _, _ = append_and_normalize_index(dict_lst_TX, dict_lst_PA)
     fig = px.histogram(database_norm, x = "Norm_EPol_Index", 
                        color = "State", 
@@ -193,9 +248,11 @@ def get_histogram(dict_lst_TX, dict_lst_PA):
     #return None
     return fig
 
-
-
 def run_word_clouds():
+    """
+    Generates the wordclouds for both states. Each state windsup with a bigram and unigram
+    wordclud saved using the filenames defined as constants at the begining of the code.
+    """
     with open(TX_from) as f:
         texas_dict = json.load(f)
 
@@ -211,6 +268,12 @@ def run_word_clouds():
     
 
 def run_norm_index_tables():
+    """
+    Generates the tables (lists of dictionaries) for both states to be used in the 
+    dashboard. Again it uses the filenames defined in the "Constants" section at the beginning
+    of the code.
+    """
+
     with open(TX_from) as f:
         texas_dict = json.load(f)
 
