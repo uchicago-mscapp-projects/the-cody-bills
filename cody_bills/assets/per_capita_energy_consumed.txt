@@ -1,0 +1,3 @@
+,Rank,State,"Total Energy Consumed per Capita, million Btu",Percentage of U.S. Total Energy Consumed per Capita
+29,State Ranked <b>30</b> out of 51,Pennsylvania,263,1.5648241804010234
+5,State Ranked <b>6</b> out of 51,Texas,461,2.742904742071756

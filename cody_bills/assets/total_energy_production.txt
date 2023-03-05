@@ -1,0 +1,3 @@
+,Rank,State,"Total Energy Production, trillion Btu",Percentage of U.S. Total Energy Production
+1,State Ranked <b>2</b> out of 51,Pennsylvania,9492,10.391487125591171
+0,State Ranked <b>1</b> out of 51,Texas,23329,25.539717989139955
