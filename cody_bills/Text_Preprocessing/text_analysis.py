@@ -53,16 +53,16 @@ MASK = 255 * MASK.astype(int)
 
 #### filenames ###
 TX_from = "pdf_links_texas.json"
-PA_from = "Text_Preprocessing/bills_pennsylvania.json"
+PA_from = "cody_bills/Text_Preprocessing/bills_pennsylvania.json"
 
-TX_to_table = "Text_Preprocessing/table_texas.json"
-PA_to_table = "Text_Preprocessing/table_pennsylvania.json"
+TX_to_table = "cody_bills/assets/table_texas.json"
+PA_to_table = "cody_bills/assets/table_pennsylvania.json"
 
-TX_to_word = "Text_Preprocessing/words_texas"
-PA_to_word = "Text_Preprocessing/words_pennsylvania"
+TX_to_word = "cody_bills/assets/words_texas"
+PA_to_word = "cody_bills/assets/words_pennsylvania"
 
-TX_to_bigram = "Text_Preprocessing/bigrams_texas"
-PA_to_bigram = "Text_Preprocessing/bigrams_pennsylvania"
+TX_to_bigram = "cody_bills/assets/bigrams_texas"
+PA_to_bigram = "cody_bills/assets/bigrams_pennsylvania"
 
 def clean_tokenize_regex(bill_text, lemm_bool = False):
     """
