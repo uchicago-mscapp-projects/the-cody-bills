@@ -1,9 +1,8 @@
 import plotly.express as px
 import plotly.io as pio
 import pandas as pd
-# import dash
-# from dash import dcc
-# from dash import html
+#Be sure to <$ pip3 install -U kaleido> to save pngs of bar graphs
+# After use <$ pip3 uninstall -y kaleido> to prevent potential issues
 
 def consumed_graph():
     """
@@ -20,7 +19,8 @@ def consumed_graph():
 )
     #FYI .columns[2] is the Consumed, CO2 Emissions, Expenditures, or Production
     #   for each each State & DC;
-    #   .columns[3] is the percentage of the total U.S. output for .columns[2] 
+    #.columns[3] is the percentage of the total U.S. for the state row 
+    #   for .columns[2] 
     bar_graph = create_graph(clean_consumed_data, 
             clean_consumed_data.columns[2], 
             clean_consumed_data.columns[3], 
@@ -43,7 +43,7 @@ def emissions_graph():
     clean_emissions_data =  pd.read_csv(
             "energy_states/eia_states_data/cleaned_data/cleaned_emissions.txt"
 )
-    #Comment on lines 22-24 describes .columns[2] & .columns[3]
+    #Comment on lines 20-23 describes .columns[2] & .columns[3]
     bar_graph = create_graph(clean_emissions_data, 
             clean_emissions_data.columns[3], 
             clean_emissions_data.columns[2], 
@@ -66,7 +66,7 @@ def expenditures_graph():
     clean_expenditures_data =  pd.read_csv(
             "energy_states/eia_states_data/cleaned_data/cleaned_expenditures.txt"
 )
-    #Comment on lines 22-24 describes .columns[2] & .columns[3]
+    #Comment on lines 20-23 describes .columns[2] & .columns[3]
     bar_graph = create_graph(clean_expenditures_data, 
             clean_expenditures_data.columns[2], 
             clean_expenditures_data.columns[3], 
@@ -89,7 +89,7 @@ def production_graph():
     clean_production_data =  pd.read_csv(
             "energy_states/eia_states_data/cleaned_data/cleaned_production.txt"
 )
-    #Comment on lines 22-24 describes .columns[2] & .columns[3]
+    #Comment on lines 20-23 describes .columns[2] & .columns[3]
     bar_graph = create_graph(clean_production_data, 
             clean_production_data.columns[3], 
             clean_production_data.columns[2], 
@@ -134,15 +134,24 @@ def create_graph(data, y_variable, added_hover_variable, title_section):
     return fig
 
 
-# app = dash.Dash()
-
-# app.layout = html.Div([
-#     dcc.Graph(id = "Energy Consumed", figure = consumed_graph())
-# ])
-
-# app.run_server(debug=True, use_reloader=False) 
-# if __name__ == '__main__':
-#     app.run_server()
+def dash_bar_graph(subject):
+    """
+    Intake the subject from the dash and output the matching bar graph.
+    
+    Inputs:
+        subject (string):
+            The subject of the bar graph for the graph
+    """
+    if "consumed" in subject.lower():
+        return consumed_graph()
+    elif "emission" in subject.lower():
+        return emissions_graph()
+    elif "expenditure" in subject.lower():
+        return expenditures_graph() 
+    #else is "production" in subject.lower() 
+    else:
+        return production_graph() 
+    
 
 def create_graph_png(graph, path):
     """
@@ -152,8 +161,8 @@ def create_graph_png(graph, path):
         graph (figure)
         path (string): A string to where the graph should be saved
     """
-    #Be sure to ($ pip3 install -U kaleido) to use the following line then 
-    # ($ pip3 uninstall -y kaleido) to prevent potential issues
+    #Be sure to <$ pip3 install -U kaleido> to use the following line then 
+    # <$ pip3 uninstall -y kaleido> to prevent potential issues
     graph_png = pio.to_image(graph, format = 'png')
     
     with open(path, "wb") as f:
