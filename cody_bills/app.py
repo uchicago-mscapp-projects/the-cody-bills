@@ -6,9 +6,6 @@ import plotly.express as px
 import dash_bootstrap_components as dbc
 from dash import Dash, html, dcc, Input, Output, get_asset_url, dash_table
 
-# datatable_pennsylvania = pd.read_csv("cody_bills/assets/table_pennsylvania.txt").to_dict("records")
-# datatable_texas = pd.read_csv("cody_bills/assets/table_texas.txt").to_dict("records")
-
 datatable_pennsylvania = pd.read_csv("cody_bills/assets/table_pennsylvania.txt")
 datatable_texas = pd.read_csv("cody_bills/assets/table_texas.txt")
 
@@ -22,25 +19,30 @@ capita_energy_consumed = pd.read_csv("cody_bills/assets/per_capita_energy_consum
 
 app = Dash(external_stylesheets=[dbc.themes.SIMPLEX])
 app.layout = html.Div([
-    # Dashboard Explanation
-    html.Div([
-
-        html.H1("Energy Policy Text Analysis", style = {'textAlign': 'center'}),
-        html.P(""" 
-            This dashboard presents graphs and a table that show the results of 
-            the Energy Policy Index, calculated as a normalized frequency found
-            in legislative bills from Pennsylvania and Texas.
-            The results of the index are presented in a table and histograms, 
-            for each state. 
-            There are also clouds of the most frequent words and bigrams of 
-            the bills for each state, and descriptive graphs per state 
-            concerning different official energy metrics. 
-        """)
-
-    ]),
-
     dbc.Card(
-        dbc.CardBody([            
+        dbc.CardBody([  
+            dbc.Row([
+                # Dashboard Explanation
+                html.Div([
+
+                    html.H1("Energy Policy Text Analysis", style = {'textAlign': 'center'}),
+
+                    html.Br(),
+                    html.P(""" 
+                        This dashboard presents graphs and a table that show the results of 
+                        the Energy Policy Index, calculated as a normalized frequency found
+                        in legislative bills from Pennsylvania and Texas.
+                        The results of the index are presented in a table and histograms, 
+                        for each state. 
+                        There are also clouds of the most frequent words and bigrams of 
+                        the bills for each state, and descriptive graphs per state 
+                        concerning different official energy metrics. 
+                    """),
+                    html.Br()
+                ]),
+            ]),
+
+            html.Br(),
             dbc.Row([
                 dbc.Col([
                     html.H3("Tables - Bills Metadata and Index", style = {'textAlign': 'center'}),
@@ -63,13 +65,14 @@ app.layout = html.Div([
                     greater to lowest. 
                     """, style = {'textAlign': 'left'}),
                 ], width = 4),
+
                 # Column of table
                 dbc.Col([
                         dash_table.DataTable( 
                         id = "data-table",
                         page_size = 15,
                         fixed_rows = {'headers': True},
-                        # filter_action='native'
+                        # filter_action = 'native',
                         style_cell = {"whiteSpace": "pre-line", 'textAlign': 'left'},
                         style_table={'minWidth': '100%'},
                         style_data = {'minWidth': '100px', 'maxWidth': '400px', 'height': 'auto', 'overflowY': 'auto'} ,
@@ -86,12 +89,19 @@ app.layout = html.Div([
                             'width': '200px%'},
                             {'if': {'column_id': 'url'},
                             'width': '100px%'}
-                        ]                    
+                        ],
+                        style_header={
+                            'backgroundColor': 'green',
+                            'color': 'white',
+                            'fontWeight': 'bold',
+                            'textAlign': 'center'
+                            },
                     )
                     
                 ], width = 8)
             ], align='center'),
 
+            html.Br(),
             dbc.Row([
                 dbc.Col([
 
@@ -121,6 +131,7 @@ app.layout = html.Div([
                 ], width=8)
             ], align='center'),
 
+            html.Br(),
             dbc.Row([
                 dbc.Col([
                     html.Div([
@@ -164,6 +175,7 @@ app.layout = html.Div([
 
             ], align='center'),
         
+            html.Br(),
             dbc.Row([
                 dbc.Col([
                     html.H3("Energy and CO2 Emission Barcharts", style = {'textAlign': 'center'}),
@@ -216,14 +228,11 @@ def get_histogram(state):
     """
     Generates a histogram for each state following the distribution of the Normalized Energy
     Policy Index depending on some conditions to use on the dashboard:
-    Inputs: dict_lst_TX, dict_lst_PA : Dictionaries without normalized indexes for Texas
-                                       and Pennsylvania.
-            state: Name of the state we want to Plot the histogram of(str).
-            with_0: If True includes observations with 0 in the normalized Energy policy Index
-                    (bool)
+    Inputs: 
+            state: Name of the state we want to Plot the histogram of(str). The same string
+                found in the dropdown of the histogram plot. Specifies if bills where no 
+                keyword was found are to be included in histogram. 
     """
-    options = ["Pennsylvania", "Pennsylvania - No Zeros", "Texas", "Texas - No Zeros"],
-
     if state == "Pennsylvania":
         fig = px.histogram(datatable_pennsylvania, 
                         x = "Energy Policy Index",
