@@ -1,0 +1,3 @@
+,Rank,State,"Total Energy Expenditures per Capita, $",Percentage of U.S. Total Energy Expenditures per Capita
+35,State Ranked <b>36</b> out of 51,Pennsylvania,2890,1.673732249171821
+9,State Ranked <b>10</b> out of 51,Texas,3703,2.1445780341464546
