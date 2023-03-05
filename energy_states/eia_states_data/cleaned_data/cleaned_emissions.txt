@@ -1,0 +1,3 @@
+Rank,State,"Total Carbon Dioxide Emissions, million metric tons",Percentage of U.S. Total Carbon Dioxide Emissions
+State Ranked <b>4</b> out of 51,Pennsylvania,218.7,4.239440169034834
+State Ranked <b>1</b> out of 51,Texas,683.2,13.243646655165062
