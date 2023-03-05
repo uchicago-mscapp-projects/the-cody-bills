@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 import networkx as nx
 from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
-from matplotlib import pyplot as plt
+#from matplotlib import pyplot as plt
 import plotly.express as px
 
 import nltk
@@ -59,19 +59,17 @@ MASK = 255 * MASK.astype(int)
 
 
 #### filenames ###
-TX_from = "../pdf_links_texas.json"
-PA_from = "bills_pennsylvania.json"
+TX_from = "pdf_links_texas.json"
+PA_from = "Text_Preprocessing/bills_pennsylvania.json"
 
-TX_to_table = "table_texas.json"
-PA_to_table = "table_pennsylvania.json"
+TX_to_table = "Text_Preprocessing/table_texas.json"
+PA_to_table = "Text_Preprocessing/table_pennsylvania.json"
 
-TX_to_word = "words_texas"
-PA_to_word = "words_pennsylvania"
+TX_to_word = "Text_Preprocessing/words_texas"
+PA_to_word = "Text_Preprocessing/words_pennsylvania"
 
-TX_to_bigram = "bigrams_texas"
-PA_to_bigram = "bigrams_pennsylvania"
-
-
+TX_to_bigram = "Text_Preprocessing/bigrams_texas"
+PA_to_bigram = "Text_Preprocessing/bigrams_pennsylvania"
 
 def clean_tokenize_regex(bill_text, lemm_bool = False):
     """
@@ -143,6 +141,7 @@ def state_word_cloud(dict_bills, n, filename, lemm_bool, mostcommon = None):
                         contour_color="black",
                         prefer_horizontal = 1.0,
                         mask = MASK).generate_from_frequencies(n_gram_dict)
+    #wordcloud.to_file(filename+".png")
     plt.imshow(wordcloud)
     plt.axis("off")
     plt.savefig(filename+".png", bbox_inches='tight')
@@ -234,24 +233,55 @@ def append_and_normalize_index(dict_lst_TX, dict_lst_PA):
 
     return (df_both_states, pennsylvania_norm_list, texas_norm_list)
 
-def get_histogram(dict_lst_TX, dict_lst_PA):
+def get_histogram(df_state_norm, state, with_0):
     """
     Generates a histogram for each state following the distribution of the Normalized Energy
-    Policy Index
-    
+    Policy Index depending on some conditions to use on the dashboard:
+    Inputs: dict_lst_TX, dict_lst_PA : Dictionaries without normalized indexes for Texas
+                                       and Pennsylvania.
+            state: Name of the state we want to Plot the histogram of(str).
+            with_0: If True includes observations with 0 in the normalized Energy policy Index
+                    (bool)
     """
-    database_norm, _, _ = append_and_normalize_index(dict_lst_TX, dict_lst_PA)
-    fig = px.histogram(database_norm, x = "Norm_EPol_Index", 
-                       color = "State", 
-                       barmode = "overlay")
+    if state == "Pennsylvania" and with_0:
+        fig = px.histogram(df_state_norm, 
+                        x = "Norm_EPol_Index",
+                        labels = {"Norm_EPol_Index": "Norm. Energy Policy Index"},
+                        color_discrete_sequence = ["mediumpurple"],
+                        pattern_shape_sequence = ["+"],
+                        nbins = 20,
+                        hover_data=df_state_norm.columns)
+    elif state == "Pennsylvania" and not with_0:
+        fig = px.histogram(df_state_norm[df_state_norm["Norm_EPol_Index"] > 0], 
+                        x = "Norm_EPol_Index",
+                        labels = {"Norm_EPol_Index": "Norm. Energy Policy Index"}, 
+                        color_discrete_sequence = ["mediumpurple"],
+                        pattern_shape_sequence = ["+"],
+                        nbins = 50,
+                        hover_data=df_state_norm.columns)
+    elif state == "Texas" and with_0:
+        fig = px.histogram(df_state_norm, 
+                        x = "Norm_EPol_Index",
+                        labels = {"Norm_EPol_Index": "Norm. Energy Policy Index"},
+                        color_discrete_sequence = ["red"],
+                        pattern_shape_sequence = ["x"],
+                        nbins = 20,
+                        hover_data=df_state_norm.columns)
+    elif state == "Texas" and not with_0:
+        fig = px.histogram(df_state_norm[df_state_norm["Norm_EPol_Index"] > 0], 
+                        x = "Norm_EPol_Index",
+                        labels = {"Norm_EPol_Index": "Norm. Energy Policy Index"},
+                        color_discrete_sequence = ["red"],
+                        pattern_shape_sequence = ["x"],
+                        nbins = 50,
+                        hover_data=df_state_norm.columns)
     
-    #return None
     return fig
 
 def run_word_clouds():
     """
     Generates the wordclouds for both states. Each state windsup with a bigram and unigram
-    wordclud saved using the filenames defined as constants at the begining of the code.
+    wordcloud saved using the filenames defined as constants at the begining of the code.
     """
     with open(TX_from) as f:
         texas_dict = json.load(f)
