@@ -12,10 +12,10 @@ datatable_texas = pd.read_csv("cody_bills/assets/table_texas.txt")
 datatable_pennsylvania_no_0 = datatable_pennsylvania[datatable_pennsylvania["Energy Policy Index"] > 0]
 datatable_texas_no_0 = datatable_texas[datatable_texas["Energy Policy Index"] > 0]
 
-total_energy_produced = pd.read_csv("cody_bills/assets/total_energy_production.txt")
-total_carbon_dioxide = pd.read_csv("cody_bills/assets/total_carbon_dioxide.txt")
-capita_energy_expenditure = pd.read_csv("cody_bills/assets/per_capita_energy_expenditure.txt")
-capita_energy_consumed = pd.read_csv("cody_bills/assets/per_capita_energy_consumed.txt")
+total_energy_produced = pd.read_csv("cody_bills/assets/cleaned_production.txt")
+total_carbon_dioxide = pd.read_csv("cody_bills/assets/cleaned_emissions.txt")
+capita_energy_expenditure = pd.read_csv("cody_bills/assets/cleaned_expenditures.txt")
+capita_energy_consumed = pd.read_csv("cody_bills/assets/cleaned_consumed.txt")
 
 app = Dash(external_stylesheets=[dbc.themes.SIMPLEX])
 app.layout = html.Div([
@@ -55,7 +55,6 @@ app.layout = html.Div([
                             id = "table-dropdown",
                             style = {'width': '100%', 'textAlign': 'center'}
                         )
-
                     ]),
 
                     html.Br(),
@@ -309,26 +308,26 @@ def graph_barchart(subject):
     if subject == "Percentage of U.S. Total Energy Production":
         data = total_energy_produced
         y_variable = "Percentage of U.S. Total Energy Production"
-        added_hover_variable = "Percentage of U.S. Total Energy Production"
-        title_section = "<b>Percengage Energy Production by Pennsylvania & Texas</b>"
+        added_hover_variable = "Total Energy Production, trillion Btu"
+        title_section = "<b>Energy Production by State</b>"
 
     elif subject == "Percentage of U.S. Total Carbon Dioxide Emissions":
         data = total_carbon_dioxide
-        y_variable = "Percentage Carbon Dioxide Emissions"
-        added_hover_variable = "Percentage of U.S. Total Carbon Dioxide Emissions"
-        title_section = "<b>Carbon Dioxide Emissions from Pennsylvania & Texas</b>"
+        y_variable = "Percentage of U.S. Total Carbon Dioxide Emissions"
+        added_hover_variable = "Total Carbon Dioxide Emissions, million metric tons"
+        title_section = "<b>Energy Expenditures by State</b>"
 
     elif subject == "Energy Expenditure Per Capita":
         data = capita_energy_expenditure
         y_variable = "Total Energy Expenditures per Capita, $"
         added_hover_variable = "Percentage of U.S. Total Energy Expenditures per Capita"
-        title_section = "<b>Energy Expenditures for Pennsylvania & Texas</b>"
+        title_section = "<b>Energy Expenditures by State</b>"
 
     else:
         data = capita_energy_consumed
         y_variable = "Total Energy Consumed per Capita, million Btu"
         added_hover_variable = "Percentage of U.S. Total Energy Consumed per Capita"
-        title_section = "<b>Energy Consumed by Pennsylvania & Texas</b>"
+        title_section = "<b>Carbon Dioxide Emissions by State</b>"
     
     fig = px.bar(data, x = "State", y = y_variable, text = "Rank",  
         color = "State", color_discrete_sequence = ["mediumpurple", "red"], 
@@ -336,7 +335,8 @@ def graph_barchart(subject):
         hover_data = [added_hover_variable]
         )
 
-    fig.update_traces(textposition = 'outside')
+    # fig.update_traces(textposition = 'outside')
+    fig.update_traces(textfont = {"color": "white"})
     
     fig.update_layout(showlegend = False,  font = dict(size = 17),
             title = {"text": title_section
