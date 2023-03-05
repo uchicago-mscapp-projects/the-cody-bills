@@ -1,6 +1,4 @@
 import pandas as pd
-# from .states_dict import us_states_anddc
-
 
 def clean_consumed_data():
     """
@@ -117,7 +115,7 @@ def save_cleaned_dataframe(data, file_path):
 
 def save_all_cleaned():
     """
-    Initiate the cleaning and then saving of the consumed, emissions, 
+    Initialize the cleaning and then saving of the consumed, emissions, 
     expenditures, and production data.
     """
     save_cleaned_dataframe(clean_consumed_data(), 
@@ -133,7 +131,8 @@ def save_all_cleaned():
             "energy_states/eia_states_data/cleaned_data/cleaned_production.txt"
 )
 
-
+#States and DC included here, towards bottom and not at top out of 
+#   personal preference
 us_states_anddc = {"AK": "Alaska",
             "AL": "Alabama",
             "AR": "Arkansas",
