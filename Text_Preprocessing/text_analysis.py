@@ -1,29 +1,22 @@
 #### Libraries #####
 import json
 import re
-import string
 from collections import Counter
 import pandas as pd
 import numpy as np
-import networkx as nx
-from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
-#from matplotlib import pyplot as plt
+from wordcloud import WordCloud
+from matplotlib import pyplot as plt
 import plotly.express as px
 
 import nltk
 nltk.download("stopwords")
 nltk.download('wordnet')
-from nltk.probability import FreqDist
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer, WordNetLemmatizer
 from nltk.util import ngrams
 
 
 #### Constants #####
-
-# with open("bills_pennsylvania.json") as f:
-#     pennsylvania_dict = json.load(f)
-
 
 ### Stop Words
 extra_stop_words = ["hb", "introduced", "page", "pennsylvania", "texas", 
@@ -267,7 +260,7 @@ def get_histogram(df_state_norm, state, with_0):
                         pattern_shape_sequence = ["x"],
                         nbins = 20,
                         hover_data=df_state_norm.columns)
-    elif state == "Texas" and not with_0:
+    else:
         fig = px.histogram(df_state_norm[df_state_norm["Norm_EPol_Index"] > 0], 
                         x = "Norm_EPol_Index",
                         labels = {"Norm_EPol_Index": "Norm. Energy Policy Index"},
@@ -290,9 +283,11 @@ def run_word_clouds():
         pennsylvania_dict = json.load(f)
     
     # Unigrams
+    print("Saving unigram wordclouds")
     state_word_cloud(texas_dict, 1, TX_to_word, True, 60)
     state_word_cloud(pennsylvania_dict, 1, PA_to_word, True, 60)
     # Bigrams
+    print("Saving bigram wordclouds")
     state_word_cloud(texas_dict, 2, TX_to_bigram, True, 60)
     state_word_cloud(pennsylvania_dict, 2, PA_to_bigram, True, 60)
     
@@ -316,11 +311,15 @@ def run_norm_index_tables():
     _, pennsylvania_norm, texas_norm = append_and_normalize_index(TX_index_dict, 
                                                                   PA_index_dict)
 
+    print("Saving Table for Pennsylvania")
     with open(PA_to_table, "w", encoding="utf-8") as nf:
         json.dump(pennsylvania_norm, nf, indent=1)
-    
+    print("Saving Table for Texas")
     with open(TX_to_table, "w", encoding="utf-8") as nf:
         json.dump(texas_norm, nf, indent=1)
 
-
     return None
+
+if __name__ == "__main__":
+    run_norm_index_tables()
+    run_word_clouds()
