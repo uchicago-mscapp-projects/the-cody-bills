@@ -6,15 +6,20 @@ import plotly.express as px
 import dash_bootstrap_components as dbc
 from dash import Dash, html, dcc, Input, Output, get_asset_url, dash_table
 
-datatable_pennsylvania = pd.read_csv("cody_bills/assets/table_pennsylvania.txt").to_dict("records")
-datatable_texas = pd.read_csv("cody_bills/assets/table_texas.txt").to_dict("records")
+# datatable_pennsylvania = pd.read_csv("cody_bills/assets/table_pennsylvania.txt").to_dict("records")
+# datatable_texas = pd.read_csv("cody_bills/assets/table_texas.txt").to_dict("records")
+
+datatable_pennsylvania = pd.read_csv("cody_bills/assets/table_pennsylvania.txt")
+datatable_texas = pd.read_csv("cody_bills/assets/table_texas.txt")
+
+datatable_pennsylvania_no_0 = datatable_pennsylvania[datatable_pennsylvania["Energy Policy Index"] > 0]
+datatable_texas_no_0 = datatable_texas[datatable_texas["Energy Policy Index"] > 0]
 
 total_energy_produced = pd.read_csv("cody_bills/assets/total_energy_production.txt")
 total_carbon_dioxide = pd.read_csv("cody_bills/assets/total_carbon_dioxide.txt")
 capita_energy_expenditure = pd.read_csv("cody_bills/assets/per_capita_energy_expenditure.txt")
 capita_energy_consumed = pd.read_csv("cody_bills/assets/per_capita_energy_consumed.txt")
 
-# SPACELAB
 app = Dash(external_stylesheets=[dbc.themes.SIMPLEX])
 app.layout = html.Div([
     # Dashboard Explanation
@@ -81,9 +86,7 @@ app.layout = html.Div([
                             'width': '200px%'},
                             {'if': {'column_id': 'url'},
                             'width': '100px%'}
-
                         ]                    
-                    
                     )
                     
                 ], width = 8)
@@ -96,7 +99,7 @@ app.layout = html.Div([
 
                     html.Br(),
                     dcc.Dropdown(
-                        options = ["Pennsylvania", "Texas"],
+                        options = ["Pennsylvania", "Pennsylvania - No Zeros", "Texas", "Texas - No Zeros"],
                         value = "Pennsylvania",
                         id = "histogram-dropdown",
                         style={'width': '100%', 'textAlign': 'center'}
@@ -191,41 +194,70 @@ app.layout = html.Div([
 ])
 
 
-
-@app.callback(
-    Output(component_id = "histogram-graph", component_property = "figure"),
-    Input(component_id = "histogram-dropdown", component_property = "value")
-)
-def graph_histogram(state):
-    list_int_1 = [random.randint(0, 101) for i in range(1000)]
-    list_int_2 = [random.randint(0, 101) for i in range(1000)]
-    list_state_1 = ["Pennsylvania" for i in range(1000)]
-    list_state_2 = ["Texas" for i in range(1000)]
-
-    if state == "Pennsylvania":
-        fig = px.histogram(list_int_1)
-    elif state == "Texas":
-        fig = px.histogram(list_int_2)
-    else:
-        list_ints = list_int_1 + list_int_2
-        list_states = list_state_1 + list_state_2
-        df = pd.DataFrame({"state": list_states, "energy_index": list_ints})
-
-        fig = px.histogram(df, x = "energy_index", color = "state", barmode = "overlay")
-
-    return fig
-
 @app.callback(
     Output(component_id = "data-table", component_property = "data"),
     Input(component_id = "table-dropdown", component_property = "value")
 )
 def create_table(state):
     if state == "Pennsylvania":
-        datatable = datatable_pennsylvania
+        datatable = datatable_pennsylvania.to_dict("records")
     else:
-        datatable = datatable_texas
+        datatable = datatable_texas.to_dict("records")
     
     return datatable
+
+
+@app.callback(
+    Output(component_id = "histogram-graph", component_property = "figure"),
+    Input(component_id = "histogram-dropdown", component_property = "value")
+)
+
+def get_histogram(state):
+    """
+    Generates a histogram for each state following the distribution of the Normalized Energy
+    Policy Index depending on some conditions to use on the dashboard:
+    Inputs: dict_lst_TX, dict_lst_PA : Dictionaries without normalized indexes for Texas
+                                       and Pennsylvania.
+            state: Name of the state we want to Plot the histogram of(str).
+            with_0: If True includes observations with 0 in the normalized Energy policy Index
+                    (bool)
+    """
+    options = ["Pennsylvania", "Pennsylvania - No Zeros", "Texas", "Texas - No Zeros"],
+
+    if state == "Pennsylvania":
+        fig = px.histogram(datatable_pennsylvania, 
+                        x = "Energy Policy Index",
+                        color_discrete_sequence = ["mediumpurple"],
+                        pattern_shape_sequence = ["+"],
+                        nbins = 40,
+                        hover_data = datatable_pennsylvania.columns)
+
+    elif state == "Pennsylvania - No Zeros":
+        fig = px.histogram(datatable_pennsylvania_no_0, 
+                        x = "Energy Policy Index",
+                        color_discrete_sequence = ["mediumpurple"],
+                        pattern_shape_sequence = ["+"],
+                        nbins = 50,
+                        hover_data=datatable_pennsylvania_no_0.columns)
+
+    elif state == "Texas":
+        fig = px.histogram(datatable_texas, 
+                        x = "Energy Policy Index",
+                        color_discrete_sequence = ["red"],
+                        pattern_shape_sequence = ["x"],
+                        nbins = 40,
+                        hover_data=datatable_texas.columns)
+
+    elif state == "Texas - No Zeros":
+        fig = px.histogram(datatable_texas_no_0, 
+                        x = "Energy Policy Index",
+                        color_discrete_sequence = ["red"],
+                        pattern_shape_sequence = ["x"],
+                        nbins = 50,
+                        hover_data=datatable_pennsylvania_no_0.columns)
+    
+    return fig
+
 
 @app.callback(
     Output(component_id = "wordcloud-pennsylvania", component_property = "src"),
@@ -240,6 +272,7 @@ def display_wordclouds_pennsylvania(ngram_type):
     encoded_image = base64.b64encode(open(image_path_pennsylvania, 'rb').read())
 
     return 'data:image/png;base64,{}'.format(encoded_image.decode())
+
 
 @app.callback(
     Output(component_id = "wordcloud-texas", component_property = "src"),
@@ -257,6 +290,7 @@ def display_wordclouds_texas(ngram_type):
     encoded_image = base64.b64encode(open(image_path_texas, 'rb').read())
 
     return 'data:image/png;base64,{}'.format(encoded_image.decode())
+
 
 @app.callback(
     Output(component_id = "barchart-graph-totals", component_property = "figure"),
@@ -305,6 +339,3 @@ def graph_barchart(subject):
 
 
 app.run_server(port = 38456)
-
-# poetry add -dev (wordcloud, preprocessing, etc.)
-
