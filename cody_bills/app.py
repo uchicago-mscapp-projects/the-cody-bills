@@ -6,6 +6,7 @@ import plotly.express as px
 import dash_bootstrap_components as dbc
 from dash import Dash, html, dcc, Input, Output, get_asset_url, dash_table
 from cody_bills.utils import helper_functions
+from cody_bills.energy_states import energy_dataviz
 
 datatable_pennsylvania = helper_functions.process_input_json("cody_bills/assets/table_pennsylvania.json")
 datatable_texas = helper_functions.process_input_json("cody_bills/assets/table_texas.json")
@@ -373,45 +374,62 @@ def display_wordclouds_texas(ngram_type):
     Output(component_id = "barchart-graph-totals", component_property = "figure"),
     Input(component_id = "barchart-dropdown", component_property = "value")
 )
+# def graph_barchart(subject):
+#     if subject == "Percentage of U.S. Total Energy Production":
+#         data = total_energy_produced
+#         y_variable = "Percentage of U.S. Total Energy Production"
+#         added_hover_variable = "Total Energy Production, trillion Btu"
+#         title_section = "<b>Energy Production by State</b>"
+
+#     elif subject == "Percentage of U.S. Total Carbon Dioxide Emissions":
+#         data = total_carbon_dioxide
+#         y_variable = "Percentage of U.S. Total Carbon Dioxide Emissions"
+#         added_hover_variable = "Total Carbon Dioxide Emissions, million metric tons"
+#         title_section = "<b>Energy Expenditures by State</b>"
+
+#     elif subject == "Energy Expenditure Per Capita":
+#         data = capita_energy_expenditure
+#         y_variable = "Total Energy Expenditures per Capita, $"
+#         added_hover_variable = "Percentage of U.S. Total Energy Expenditures per Capita"
+#         title_section = "<b>Energy Expenditures by State</b>"
+
+#     else:
+#         data = capita_energy_consumed
+#         y_variable = "Total Energy Consumed per Capita, million Btu"
+#         added_hover_variable = "Percentage of U.S. Total Energy Consumed per Capita"
+#         title_section = "<b>Carbon Dioxide Emissions by State</b>"
+    
+#     fig = px.bar(data, x = "State", y = y_variable, text = "Rank",  
+#         color = "State", color_discrete_sequence = ["mediumpurple", "red"], 
+#         pattern_shape = "State", pattern_shape_sequence=["+", "x"],
+#         hover_data = [added_hover_variable]
+#         )
+
+#     fig.update_traces(textfont = {"color": "white"})
+    
+#     fig.update_layout(showlegend = False,  font = dict(size = 15),
+#             title = {"text": title_section
+#             , "y": 0.95, "x": 0.5, "xanchor": "center", "yanchor": "top"},
+#             yaxis = dict(title = y_variable, title_font = dict(size = 16))
+#             )
+
+#     return fig
+
 def graph_barchart(subject):
-    if subject == "Percentage of U.S. Total Energy Production":
-        data = total_energy_produced
-        y_variable = "Percentage of U.S. Total Energy Production"
-        added_hover_variable = "Total Energy Production, trillion Btu"
-        title_section = "<b>Energy Production by State</b>"
+    """
+    Create the figure of the barchart from the function 
+    of the energy_states data visualization folder. 
 
-    elif subject == "Percentage of U.S. Total Carbon Dioxide Emissions":
-        data = total_carbon_dioxide
-        y_variable = "Percentage of U.S. Total Carbon Dioxide Emissions"
-        added_hover_variable = "Total Carbon Dioxide Emissions, million metric tons"
-        title_section = "<b>Energy Expenditures by State</b>"
+    Inputs:
+        subject(str): the subject from the bar chart 
+        dropdown, selected by the user. 
 
-    elif subject == "Energy Expenditure Per Capita":
-        data = capita_energy_expenditure
-        y_variable = "Total Energy Expenditures per Capita, $"
-        added_hover_variable = "Percentage of U.S. Total Energy Expenditures per Capita"
-        title_section = "<b>Energy Expenditures by State</b>"
-
-    else:
-        data = capita_energy_consumed
-        y_variable = "Total Energy Consumed per Capita, million Btu"
-        added_hover_variable = "Percentage of U.S. Total Energy Consumed per Capita"
-        title_section = "<b>Carbon Dioxide Emissions by State</b>"
+    Returns: 
+        fig(Plotly Express Figure): the bar graph figure
+        from Plotly Express
+    """
+    fig = energy_dataviz.dash_bar_graph(subject)
     
-    fig = px.bar(data, x = "State", y = y_variable, text = "Rank",  
-        color = "State", color_discrete_sequence = ["mediumpurple", "red"], 
-        pattern_shape = "State", pattern_shape_sequence=["+", "x"],
-        hover_data = [added_hover_variable]
-        )
-
-    fig.update_traces(textfont = {"color": "white"})
-    
-    fig.update_layout(showlegend = False,  font = dict(size = 15),
-            title = {"text": title_section
-            , "y": 0.95, "x": 0.5, "xanchor": "center", "yanchor": "top"},
-            yaxis = dict(title = y_variable, title_font = dict(size = 16))
-            )
-
     return fig
 
 
