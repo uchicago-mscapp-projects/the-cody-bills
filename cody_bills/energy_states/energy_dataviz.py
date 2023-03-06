@@ -185,4 +185,4 @@ def intialize_graph_pngs():
             "cody_bills/energy_states/eia_states_figures/production_graph.png")
 
 #The following line is to initialize the functions to create the graph pngs
-intialize_graph_pngs()
+# intialize_graph_pngs()
