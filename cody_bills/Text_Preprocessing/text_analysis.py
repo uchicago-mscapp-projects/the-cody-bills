@@ -1,7 +1,14 @@
-######################################
-##  Author: Santiago Satizabal     ###
-##  email: ssatizabal@uchicago.edu ##
-#####################################
+#######################################################
+##  This script takes the bills scraped              ##
+##  by Manuel, clean and tokenize their text         ##
+##  and with it generates wordclouds as PNG files    ##
+##  and json files with The Normalized Energy        ##
+##  Policy Index (calculated using a sliding window  ##
+##  algorithm)                                       ##
+##                                                   ##
+##  Author: Santiago Satizabal                       ##
+##  email: ssatizabal@uchicago.edu                   ##
+#######################################################
 
 ## TEXT PROCESSING ANALYSIS ##
 
@@ -27,14 +34,16 @@ from nltk.util import ngrams
 
 ### Stop Words
 extra_stop_words = ["hb", "introduced", "page", "pennsylvania", "texas", 
-                    "illinois", "project", "bill", "bills", "id", "key", "assembly",
-                    "hereby", "allocation", "shall", "act", "state", "states",
-                    "may","section", "subsection", "sections", "subsections",
-                    "commonwealth", "general", "law","code", "person", "chapter", 
-                    "chapters", "contingency", "contingencies", "read", "amended", "take", "takes" 
-                    "legislature", "enacted", "date", "version","text","follows", "government", "take",
-                    "effect", "year","years", "district", "districts", "department", "departments",
-                    "thesame", "topic", "see"]
+                    "illinois", "project", "bill", "bills", "id", "key", 
+                    "assembly", "hereby", "allocation", "shall", "act", 
+                    "state", "states", "may","section", "subsection", 
+                    "sections", "subsections","commonwealth", "general", 
+                    "law","code", "person", "chapter", "chapters", "contingency",
+                    "contingencies", "read", "amended", "take", "takes" 
+                    "legislature", "enacted", "date", "version","text","follows", 
+                    "government", "take", "effect", "year","years", "district", 
+                    "districts", "department", "departments", "thesame", "topic", 
+                    "see"]
 
 stopwords_fix = stopwords.words("english") + extra_stop_words
 porter = PorterStemmer()
@@ -98,14 +107,18 @@ def clean_tokenize_regex(bill_text, lemm_bool = False):
 
 def count_dict_state(dict_bills, n, lemm_bool, mostcommon = None):
     """
-    Creates a dictionary that maps an ngram to the number of times it appears 
+    Creates a dictionary that maps an ngram to the number of times it appears
     in a set of bills. 
     Inputs: dict_bills: nested dictionary that contains all the extracted 
-                        bills of a given state with the information of the bills
-            n: integer that represents the number of words we want the ngrams to have
+                        bills of a given state with the information of 
+                        the bills
+            n: integer that represents the number of words we want the 
+               ngrams to have
             lemm_bool: lemmatizes the tokens if True (bool)
-            mostcommon: the top mostcommon ngrams we want the dictionary to show (int)
-    Returns: Dictionary that maps each kgram found in the set of bills of the state
+            mostcommon: the top mostcommon ngrams we want the dictionary to 
+                        show (int)
+    Returns: Dictionary that maps each kgram found in the set of bills of 
+             the state
              to the number of times it appears in the whole corpus
     """
     list_ngrams = []
@@ -124,13 +137,18 @@ def count_dict_state(dict_bills, n, lemm_bool, mostcommon = None):
 
 def state_word_cloud(dict_bills, n, filename, lemm_bool, mostcommon = None):
     """
-    Plots a wordcloud of the most common ngrams from the scraped dictionary of bills.  
+    Plots a wordcloud of the most common ngrams from the scraped dictionary 
+    of bills.  
     Inputs: dict_bills: nested dictionary that contains all the extracted 
-                        bills of a given state with the information of the bills
-            n: integer that represents the number of words we want the ngrams to have
-            filename: the name of the filename or path we will save the word cloud plot in.
+                        bills of a given state with the information of the 
+                        bills
+            n: integer that represents the number of words we want the ngrams
+            to have
+            filename: the name of the filename or path we will save the word 
+            cloud plot in.
             lemm_bool: lemmatizes the tokens if True (bool)
-            mostcommon: the top mostcommon ngrams we want the dictionary to show (int)
+            mostcommon: the top mostcommon ngrams we want the dictionary to 
+            show (int)
     Returns: None. Saves the wordcloud plot in the specified filename
     """
 
@@ -141,7 +159,6 @@ def state_word_cloud(dict_bills, n, filename, lemm_bool, mostcommon = None):
                         contour_color="black",
                         prefer_horizontal = 1.0,
                         mask = MASK).generate_from_frequencies(n_gram_dict)
-    #wordcloud.to_file(filename+".png")
     plt.imshow(wordcloud)
     plt.axis("off")
     plt.savefig(filename+".png", bbox_inches='tight')
@@ -153,16 +170,18 @@ def sliding_window_key_word(keyngrams, bill_text_lst, window_size):
     """
     From the tokenized text of a bill (list), returns an indicator calculated
     following a sliding window algorithm. The algorithm takes a slice of 
-    the list of tokens of a given size (window_size) and searches for the elements
-    of a list of key-ngrams in the window. Each time a key-ngram appears in the window
-    the count augments in 1. The window leaps in a fourth of its size 
-    (arbitrarily chose that size but can easily be changed), and repeat the process. 
-    The final count is divided by the number of tokens in the bill. 
-    Inputs: keyngrams: list of key-ngrams related to energy policy (list of tuples)
+    the list of tokens of a given size (window_size) and searches for the 
+    elements of a list of key-ngrams in the window. Each time a key-ngram 
+    appears in the window the count augments in 1. The window leaps in a 
+    fourth of its size (arbitrarily chose that size but can easily be changed), 
+    and repeat the process. The final count is divided by the number of 
+    tokens in the bill. 
+    Inputs: keyngrams: list of key-ngrams related to energy policy 
+                       (list of tuples)
             bill_text_lst: list of the tokens that make up the text of a bill
             window_size: integer that represents the size of the slice.
-    Returns: A float that is the ratio between the final count and the length of the bill times
-             100. In this case it is the Energy policy index
+    Returns: A float that is the ratio between the final count and the length 
+             of the bill times 100. In this case it is the Energy policy index
     """
 
     count = 0
@@ -208,10 +227,11 @@ def dict_energy_policy_index(keyngrams, dict_bills, window_size):
 
 def append_and_normalize_index(dict_lst_TX, dict_lst_PA):
     """
-    Takes the dictionaries of Texas and Pennsylvania that have the Energy Policy Index
-    append them, normalize the index between 1 and 0 and divide the database into two 
-    lists of dictionaries again. 
-    Inputs: dict_lst_TX, dict_lst_PA: lists of dictionaries with non-normalized 
+    Takes the dictionaries of Texas and Pennsylvania that have the 
+    Energy Policy Index, append them, normalize the index between 
+    1 and 0 using feature scaling (x - Min(X))/(Max(X) - Min(X))
+    and divide the database into two lists of dictionaries again. 
+    Inputs: dict_lst_TX, dict_lst_PA: lists of dictionaries with non-normalized
                                       energy policy index
     Returns: Tuple with the complete (2-state) dataframe, and each state's list
              of dictionaries updated with the normalized index. 
@@ -220,7 +240,6 @@ def append_and_normalize_index(dict_lst_TX, dict_lst_PA):
     df_TX = pd.DataFrame.from_dict(dict_lst_TX, orient='columns')
     df_PA = pd.DataFrame.from_dict(dict_lst_PA, orient='columns')
     df_both_states = pd.concat([df_PA,df_TX])
-    #df_both_states.groupby('State').describe()
     min_epol_index = min(df_both_states["Energy Policy Index"])
     max_epol_index = max(df_both_states["Energy Policy Index"])
     df_both_states["Norm_EPol_Index"] = ((df_both_states["Energy Policy Index"] - 
@@ -233,56 +252,11 @@ def append_and_normalize_index(dict_lst_TX, dict_lst_PA):
 
     return (df_both_states, pennsylvania_norm_list, texas_norm_list)
 
-
-def get_histogram(df_state_norm, state):
-    """
-    Generates a histogram for each state following the distribution of the Normalized Energy
-    Policy Index depending on some conditions to use on the dashboard:
-    Inputs: dict_lst_TX, dict_lst_PA : Dictionaries without normalized indexes for Texas
-                                       and Pennsylvania.
-            state: Name of the state we want to Plot the histogram of(str).
-            with_0: If True includes observations with 0 in the normalized Energy policy Index
-                    (bool)
-    """
-    if state == "Pennsylvania":
-        fig = px.histogram(df_state_norm, 
-                        x = "Norm_EPol_Index",
-                        labels = {"Norm_EPol_Index": "Norm. Energy Policy Index"},
-                        color_discrete_sequence = ["mediumpurple"],
-                        pattern_shape_sequence = ["+"],
-                        nbins = 20,
-                        hover_data=df_state_norm.columns)
-    elif state == "Pennsylvania - No Zeros":
-        fig = px.histogram(df_state_norm[df_state_norm["Norm_EPol_Index"] > 0], 
-                        x = "Norm_EPol_Index",
-                        labels = {"Norm_EPol_Index": "Norm. Energy Policy Index"}, 
-                        color_discrete_sequence = ["mediumpurple"],
-                        pattern_shape_sequence = ["+"],
-                        nbins = 50,
-                        hover_data=df_state_norm.columns)
-    elif state == "Texas":
-        fig = px.histogram(df_state_norm, 
-                        x = "Norm_EPol_Index",
-                        labels = {"Norm_EPol_Index": "Norm. Energy Policy Index"},
-                        color_discrete_sequence = ["red"],
-                        pattern_shape_sequence = ["x"],
-                        nbins = 20,
-                        hover_data=df_state_norm.columns)
-    else:
-        fig = px.histogram(df_state_norm[df_state_norm["Norm_EPol_Index"] > 0], 
-                        x = "Norm_EPol_Index",
-                        labels = {"Norm_EPol_Index": "Norm. Energy Policy Index"},
-                        color_discrete_sequence = ["red"],
-                        pattern_shape_sequence = ["x"],
-                        nbins = 50,
-                        hover_data=df_state_norm.columns)
-    
-    return fig
-
 def run_word_clouds():
     """
-    Generates the wordclouds for both states. Each state windsup with a bigram and unigram
-    wordcloud saved using the filenames defined as constants at the begining of the code.
+    Generates the wordclouds for both states. Each state windsup with
+    a bigram and unigram wordcloud saved using the filenames defined 
+    as constants at the begining of the code.
     """
     with open(TX_from) as f:
         texas_dict = json.load(f)
@@ -302,9 +276,9 @@ def run_word_clouds():
 
 def run_norm_index_tables():
     """
-    Generates the tables (lists of dictionaries) for both states to be used in the 
-    dashboard. Again it uses the filenames defined in the "Constants" section at the beginning
-    of the code.
+    Generates the tables (lists of dictionaries) for both states to be 
+    used in the dashboard. Again it uses the filenames defined in the 
+    "Constants" section at the beginning of the code.
     """
 
     with open(TX_from) as f:
