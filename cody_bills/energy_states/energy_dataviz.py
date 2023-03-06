@@ -124,7 +124,6 @@ def create_graph(data, y_variable, added_hover_variable, title_section):
     #This moves the "Rank" column info ontop of the bar graph instead of inside
     fig.update_traces(textposition = 'outside', textfont = dict(size = 12.5),
             insidetextanchor = 'start')
-    # fig.update_traces(textfont = {"color": "white"})
     
     fig.update_layout(showlegend = False,  font = dict(size = 15),
             title = {"text": title_section
