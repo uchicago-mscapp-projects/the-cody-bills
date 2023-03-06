@@ -1,13 +1,12 @@
-import json
-import random
-import base64
+# The code of this file was done by Pablo Montenegro Helfer
+
 import pandas as pd
-import plotly.express as px
 import dash_bootstrap_components as dbc
-from dash import Dash, html, dcc, Input, Output, get_asset_url, dash_table
+from dash import Dash, html, dcc, Input, Output, dash_table
 from cody_bills.utils import helper_functions
 from cody_bills.energy_states import energy_dataviz
 
+# Open the json files with the metadata and index, and do minor preprocess for visualization
 datatable_pennsylvania = helper_functions.process_input_json("cody_bills/assets/table_pennsylvania.json")
 datatable_texas = helper_functions.process_input_json("cody_bills/assets/table_texas.json")
 
@@ -23,15 +22,9 @@ list_metrics = ["State", "No. of bills", "Mean", "Standard Deviation",
 
 descr_table.columns = list_metrics
 
-# Create tables without without the indexes with zeros
+# Create tables without without the indexes with zeros (used in histogram)
 datatable_pennsylvania_no_0 = datatable_pennsylvania[datatable_pennsylvania["Energy Policy Index"] > 0]
 datatable_texas_no_0 = datatable_texas[datatable_texas["Energy Policy Index"] > 0]
-
-# Import energy policy information for the barcharts
-total_energy_produced = pd.read_csv("cody_bills/assets/cleaned_production.txt")
-total_carbon_dioxide = pd.read_csv("cody_bills/assets/cleaned_emissions.txt")
-capita_energy_expenditure = pd.read_csv("cody_bills/assets/cleaned_expenditures.txt")
-capita_energy_consumed = pd.read_csv("cody_bills/assets/cleaned_consumed.txt")
 
 app = Dash(external_stylesheets=[dbc.themes.SIMPLEX])
 app.layout = html.Div([
@@ -59,6 +52,7 @@ app.layout = html.Div([
             ]),
 
             html.Br(),
+            # Descriptive Statistics of the Energy Index
             dbc.Row([
                 dbc.Col([
                     html.H3("Energy Policy Index - Descriptive Statistics", 
@@ -95,6 +89,7 @@ app.layout = html.Div([
             ]),
 
             html.Br(),
+            # Histograms of the Energy Index
             dbc.Row([
                 dbc.Col([
 
@@ -125,6 +120,7 @@ app.layout = html.Div([
             ], align='center'),
 
             html.Br(),
+            # Wordclouds
             dbc.Row([
                 dbc.Col([
                     html.Div([
@@ -169,6 +165,7 @@ app.layout = html.Div([
             ], align='center'),
         
             html.Br(),
+            # Barcharts
             dbc.Row([
                 dbc.Col([
                     html.H3("Energy and CO2 Emission Barcharts", style = {'textAlign': 'center'}),
@@ -201,6 +198,7 @@ app.layout = html.Div([
             ], align='center'),
 
             html.Br(),
+            # Table
             dbc.Row([
                 dbc.Col([
                     html.H3("Tables - Bills Metadata and Index", style = {'textAlign': 'center'}),
@@ -224,7 +222,6 @@ app.layout = html.Div([
                     """, style = {'textAlign': 'left'}),
                 ], width = 4),
 
-                # Column of table
                 dbc.Col([
                         dash_table.DataTable( 
                         id = "data-table",
@@ -265,11 +262,27 @@ app.layout = html.Div([
 ])
 
 
+# All the callbacks require the function below to have a structure
+# with "def" and "return" statements (not able to import a function
+# and use it)
 @app.callback(
     Output(component_id = "data-table", component_property = "data"),
     Input(component_id = "table-dropdown", component_property = "value")
 )
 def create_table(state):
+    """ 
+    Create a dictionary from the Pandas input dataframe with the 
+    Pandas method "to_dict", depending on the state selection
+    from the user. This dictionary is the input Dash needs to 
+    display the table. 
+
+    Inputs:
+        state(str): the state selected by the user
+    Returns:
+        datatable(dict): the datatable from the selected
+            state as a dictionary
+
+    """
     if state == "Pennsylvania":
         datatable = datatable_pennsylvania.to_dict("records")
     else:
@@ -283,57 +296,32 @@ def create_table(state):
     Input(component_id = "histogram-dropdown", component_property = "value")
 )
 
-def get_histogram(state):
+def get_histogram(dropdown_select):
     """
     Generates a histogram for each state following the distribution of the Normalized Energy
-    Policy Index depending on some conditions to use on the dashboard:
+    Policy Index depending on some conditions to use on the dashboard.
+
     Inputs: 
-            state: Name of the state we want to Plot the histogram of(str). The same string
-                found in the dropdown of the histogram plot. Specifies if bills where no 
-                keyword was found are to be included in histogram. 
+        dropdown_select(str): state selected by user in the dropdown selection, 
+            specifying if graph should not include bills where no keyword was found.
+
+    Returns: 
+        fig(Plotly Express Figure): the histogram graph figure
+            from Plotly Express
+
     """
-    if state == "Pennsylvania":
-        fig = px.histogram(datatable_pennsylvania, 
-                        x = "Energy Policy Index",
-                        color_discrete_sequence = ["mediumpurple"],
-                        pattern_shape_sequence = ["+"],
-                        nbins = 40,
-                        hover_data = datatable_pennsylvania.columns)
-        title_section = "<b>Histogram Pennsylvania</b>"
+    if dropdown_select == "Pennsylvania":
+        fig = helper_functions.get_histogram(dropdown_select, datatable_pennsylvania)
 
-    elif state == "Pennsylvania - No Zeros":
-        fig = px.histogram(datatable_pennsylvania_no_0, 
-                        x = "Energy Policy Index",
-                        color_discrete_sequence = ["mediumpurple"],
-                        pattern_shape_sequence = ["+"],
-                        nbins = 50,
-                        hover_data = datatable_pennsylvania_no_0.columns)
-        title_section = "<b>Histogram Pennsylvania - No Zeros</b>"
+    elif dropdown_select == "Pennsylvania - No Zeros":
+        fig = helper_functions.get_histogram(dropdown_select, datatable_pennsylvania_no_0)
 
-    elif state == "Texas":
-        fig = px.histogram(datatable_texas, 
-                        x = "Energy Policy Index",
-                        color_discrete_sequence = ["red"],
-                        pattern_shape_sequence = ["x"],
-                        nbins = 40,
-                        hover_data = datatable_texas.columns)
-        title_section = "<b>Histogram Texas</b>"
-
-
-    elif state == "Texas - No Zeros":
-        fig = px.histogram(datatable_texas_no_0, 
-                        x = "Energy Policy Index",
-                        color_discrete_sequence = ["red"],
-                        pattern_shape_sequence = ["x"],
-                        nbins = 50,
-                        hover_data = datatable_pennsylvania_no_0.columns)
-        title_section = "<b>Histogram Texas - No Zeros</b>"
-
-    fig.update_layout(showlegend = False,  font = dict(size = 15),
-            title = {"text": title_section
-            , "y": 0.95, "x": 0.5, "xanchor": "center", "yanchor": "top"}
-            )
+    elif dropdown_select == "Texas":
+        fig = helper_functions.get_histogram(dropdown_select, datatable_texas)
     
+    else:
+         fig = helper_functions.get_histogram(dropdown_select, datatable_texas_no_0)       
+
     return fig
 
 
@@ -341,79 +329,48 @@ def get_histogram(state):
     Output(component_id = "wordcloud-pennsylvania", component_property = "src"),
     Input(component_id = "wordcloud-dropdown", component_property = "value")
 )
-def display_wordclouds_pennsylvania(ngram_type):
-    if ngram_type == "Words":
-        image_path_pennsylvania = "cody_bills/assets/words_pennsylvania.png"
-    else:
-        image_path_pennsylvania = "cody_bills/assets/bigrams_pennsylvania.png"
-       
-    encoded_image = base64.b64encode(open(image_path_pennsylvania, 'rb').read())
 
-    return 'data:image/png;base64,{}'.format(encoded_image.decode())
+def display_wordclouds_pennsylvania(ngram_type):
+    """
+    Create the corresponding image object to display 
+    in the dashboard for Pennsylvania
+
+    Inputs:
+        ngram_type(str): Words or Bigrams
+
+    Returns: 
+        image(PNG - base64): the image of the cloud
+    """
+    image = helper_functions.display_wordclouds(ngram_type, "Pennsylvania")
+
+    return image
 
 
 @app.callback(
     Output(component_id = "wordcloud-texas", component_property = "src"),
     Input(component_id = "wordcloud-dropdown", component_property = "value")
 )
+
 def display_wordclouds_texas(ngram_type):
     """
-    Docstring
+    Create the corresponding image object to display 
+    in the dashboard for Texas
+
+    Inputs:
+        ngram_type(str): Words or Bigrams
+
+    Returns: 
+        image(PNG - base64): the image of the cloud
     """
-    if ngram_type == "Words":
-        image_path_texas = "cody_bills/assets/words_texas.png"
-    else:
-        image_path_texas = "cody_bills/assets/bigrams_texas.png"
+    image = helper_functions.display_wordclouds(ngram_type, "Texas")
 
-    encoded_image = base64.b64encode(open(image_path_texas, 'rb').read())
-
-    return 'data:image/png;base64,{}'.format(encoded_image.decode())
+    return image
 
 
 @app.callback(
     Output(component_id = "barchart-graph-totals", component_property = "figure"),
     Input(component_id = "barchart-dropdown", component_property = "value")
 )
-# def graph_barchart(subject):
-#     if subject == "Percentage of U.S. Total Energy Production":
-#         data = total_energy_produced
-#         y_variable = "Percentage of U.S. Total Energy Production"
-#         added_hover_variable = "Total Energy Production, trillion Btu"
-#         title_section = "<b>Energy Production by State</b>"
-
-#     elif subject == "Percentage of U.S. Total Carbon Dioxide Emissions":
-#         data = total_carbon_dioxide
-#         y_variable = "Percentage of U.S. Total Carbon Dioxide Emissions"
-#         added_hover_variable = "Total Carbon Dioxide Emissions, million metric tons"
-#         title_section = "<b>Energy Expenditures by State</b>"
-
-#     elif subject == "Energy Expenditure Per Capita":
-#         data = capita_energy_expenditure
-#         y_variable = "Total Energy Expenditures per Capita, $"
-#         added_hover_variable = "Percentage of U.S. Total Energy Expenditures per Capita"
-#         title_section = "<b>Energy Expenditures by State</b>"
-
-#     else:
-#         data = capita_energy_consumed
-#         y_variable = "Total Energy Consumed per Capita, million Btu"
-#         added_hover_variable = "Percentage of U.S. Total Energy Consumed per Capita"
-#         title_section = "<b>Carbon Dioxide Emissions by State</b>"
-    
-#     fig = px.bar(data, x = "State", y = y_variable, text = "Rank",  
-#         color = "State", color_discrete_sequence = ["mediumpurple", "red"], 
-#         pattern_shape = "State", pattern_shape_sequence=["+", "x"],
-#         hover_data = [added_hover_variable]
-#         )
-
-#     fig.update_traces(textfont = {"color": "white"})
-    
-#     fig.update_layout(showlegend = False,  font = dict(size = 15),
-#             title = {"text": title_section
-#             , "y": 0.95, "x": 0.5, "xanchor": "center", "yanchor": "top"},
-#             yaxis = dict(title = y_variable, title_font = dict(size = 16))
-#             )
-
-#     return fig
 
 def graph_barchart(subject):
     """
@@ -431,7 +388,6 @@ def graph_barchart(subject):
     fig = energy_dataviz.dash_bar_graph(subject)
     
     return fig
-
 
 
 app.run_server(port = 38456)
