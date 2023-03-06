@@ -1,4 +1,9 @@
 import pandas as pd
+from cody_bills.energy_states import states_dict
+
+#run function from cd 30122-project-the-cody-bills within a poetry shell
+#   poetry run python cody_bills/energy_states/eia_clean.py
+
 
 def clean_consumed_data():
     """
@@ -8,7 +13,7 @@ def clean_consumed_data():
     Returns:
         A cleaned and edited dataframe of energy consumed data
     """
-    consumed_filename = "energy_states/eia_states_data/raw_data/TotalEnergyConsumedperCapita-StateRankings.csv"    
+    consumed_filename = "cody_bills/energy_states/eia_states_data/raw_data/TotalEnergyConsumedperCapita-StateRankings.csv"    
     
     return clean(consumed_filename) 
 
@@ -21,7 +26,7 @@ def clean_emissions_data():
     Returns:
         A cleaned and edited dataframe of CO2 emissions data 
     """
-    emissions_filename = "energy_states/eia_states_data/raw_data/TotalCarbonDioxideEmissions-StateRankings.csv"
+    emissions_filename = "cody_bills/energy_states/eia_states_data/raw_data/TotalCarbonDioxideEmissions-StateRankings.csv"
     
     return clean(emissions_filename)
 
@@ -34,7 +39,7 @@ def clean_expenditures_data():
     Returns:
         A cleaned and edited dataframe of energy expenditures data 
     """
-    expenditures_filename = "energy_states/eia_states_data/raw_data/TotalEnergyExpendituresperCapita-StateRankings.csv"
+    expenditures_filename = "cody_bills/energy_states/eia_states_data/raw_data/TotalEnergyExpendituresperCapita-StateRankings.csv"
     
     return clean(expenditures_filename)
 
@@ -47,7 +52,7 @@ def clean_production_data():
     Returns:
         A cleaned and edited dataframe of energy production data 
     """
-    production_filename  = "energy_states/eia_states_data/raw_data/TotalEnergyProduction-StateRankings.csv"
+    production_filename  = "cody_bills/energy_states/eia_states_data/raw_data/TotalEnergyProduction-StateRankings.csv"
     
     return clean(production_filename)
 
@@ -91,7 +96,7 @@ def clean(filename):
     
     data[["Rank", "State"]] = data.apply(lambda row: 
             ["State Ranked <b>{}</b> out of 51".format(row["Rank"]),
-            us_states_anddc[row["State"]]], axis = 1, 
+            states_dict.dict_us_statesanddc()[row["State"]]], axis = 1, 
             result_type = "expand"
 )
  
@@ -119,73 +124,16 @@ def save_all_cleaned():
     expenditures, and production data.
     """
     save_cleaned_dataframe(clean_consumed_data(), 
-            "energy_states/eia_states_data/cleaned_data/cleaned_consumed.txt"
+            "cody_bills/energy_states/eia_states_data/cleaned_data/cleaned_consumed.txt"
 )
     save_cleaned_dataframe(clean_emissions_data(), 
-            "energy_states/eia_states_data/cleaned_data/cleaned_emissions.txt"
+            "cody_bills/energy_states/eia_states_data/cleaned_data/cleaned_emissions.txt"
 )
     save_cleaned_dataframe(clean_expenditures_data(),
-            "energy_states/eia_states_data/cleaned_data/cleaned_expenditures.txt"
+            "cody_bills/energy_states/eia_states_data/cleaned_data/cleaned_expenditures.txt"
 )
     save_cleaned_dataframe(clean_production_data(), 
-            "energy_states/eia_states_data/cleaned_data/cleaned_production.txt"
+            "cody_bills/energy_states/eia_states_data/cleaned_data/cleaned_production.txt"
 )
 
-#States and DC included here, towards bottom and not at top out of 
-#   personal preference
-us_states_anddc = {"AK": "Alaska",
-            "AL": "Alabama",
-            "AR": "Arkansas",
-            "AZ": "Arizona",
-            "CA": "California",
-            "CO": "Colorado",
-            "CT": "Connecticut",
-            "DC": "District of Columbia",
-            "DE": "Delaware",
-            "FL": "Florida",
-            "GA": "Georgia",
-            "HI": "Hawaii",
-            "IA": "Iowa",
-            "ID": "Idaho",
-            "IL": "Illinois",
-            "IN": "Indiana",
-            "KS": "Kansas",
-            "KY": "Kentucky",
-            "LA": "Louisiana",
-            "MA": "Massachusetts",
-            "MD": "Maryland",
-            "ME": "Maine",
-            "MI": "Michigan",
-            "MN": "Minnesota",
-            "MO": "Missouri",
-            "MS": "Mississippi",
-            "MT": "Montana",
-            "NC": "North Carolina",
-            "ND": "North Dakota",
-            "NE": "Nebraska",
-            "NH": "New Hampshire",
-            "NJ": "New Jersey",
-            "NM": "New Mexico",
-            "NV": "Nevada",
-            "NY": "New York",
-            "OH": "Ohio",
-            "OK": "Oklahoma",
-            "OR": "Oregon",
-            "PA": "Pennsylvania",
-            "RI": "Rhode Island",
-            "SC": "South Carolina",
-            "SD": "South Dakota",
-            "TN": "Tennessee",
-            "TX": "Texas",
-            "UT": "Utah",
-            "VA": "Virginia",
-            "VT": "Vermont",
-            "WA": "Washington",
-            "WI": "Wisconsin",
-            "WV": "West Virginia",
-            "WY": "Wyoming"
-}
-
-#run function from cd 30122-project-the-cody-bills within a poetry shell
-#   poetry run python energy_states/eia_clean.py
 save_all_cleaned()

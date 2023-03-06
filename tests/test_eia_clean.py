@@ -1,9 +1,9 @@
-import pytest
-from energy_states.eia_clean import clean_consumed_data, clean_emissions_data
-from energy_states.eia_clean import clean_expenditures_data
-from energy_states.eia_clean import clean_production_data
+from cody_bills.energy_states.eia_clean import clean_consumed_data
+from cody_bills.energy_states.eia_clean import clean_emissions_data
+from cody_bills.energy_states.eia_clean import clean_expenditures_data
+from cody_bills.energy_states.eia_clean import clean_production_data
 
-#Run tests with <$ poetry run pytest tests/test_energy_dataviz.py>
+#Run tests with <$ poetry run pytest tests/test_eia_clean.py>
 
 def test_clean_consumed_data():
     data = clean_consumed_data()

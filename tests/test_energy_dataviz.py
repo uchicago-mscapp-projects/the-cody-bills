@@ -1,7 +1,7 @@
-from energy_states.energy_dataviz import consumed_graph, emissions_graph
-from energy_states.energy_dataviz import expenditures_graph, production_graph
-#Be sure to <$ pip3 install -U kaleido>
-# After use <$ pip3 uninstall -y kaleido> to prevent potential issues
+from cody_bills.energy_states.energy_dataviz import consumed_graph
+from cody_bills.energy_states.energy_dataviz import emissions_graph
+from cody_bills.energy_states.energy_dataviz import expenditures_graph 
+from cody_bills.energy_states.energy_dataviz import production_graph
 
 #Run tests with <$ poetry run pytest tests/test_energy_dataviz.py>
 

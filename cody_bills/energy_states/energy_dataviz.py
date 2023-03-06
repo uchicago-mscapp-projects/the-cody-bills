@@ -1,8 +1,8 @@
 import plotly.express as px
 import plotly.io as pio
 import pandas as pd
-#Be sure to <$ pip3 install -U kaleido> to save pngs of bar graphs
-# After use <$ pip3 uninstall -y kaleido> to prevent potential issues
+#run function from cd 30122-project-the-cody-bills within a poetry shell
+#   poetry run python cody_bills/energy_states/energy_dataviz.py
 
 def consumed_graph():
     """
@@ -15,7 +15,7 @@ def consumed_graph():
     """
     title_section = "<b>Energy Consumed by State</b>"
     clean_consumed_data = pd.read_csv(
-            "energy_states/eia_states_data/cleaned_data/cleaned_consumed.txt"
+            "cody_bills/energy_states/eia_states_data/cleaned_data/cleaned_consumed.txt"
 )
     #FYI .columns[2] is the Consumed, CO2 Emissions, Expenditures, or Production
     #   for each each State & DC;
@@ -41,7 +41,7 @@ def emissions_graph():
     """
     title_section =  "<b>Carbon Dioxide Emissions by State</b>"
     clean_emissions_data =  pd.read_csv(
-            "energy_states/eia_states_data/cleaned_data/cleaned_emissions.txt"
+            "cody_bills/energy_states/eia_states_data/cleaned_data/cleaned_emissions.txt"
 )
     #Comment on lines 20-23 describes .columns[2] & .columns[3]
     bar_graph = create_graph(clean_emissions_data, 
@@ -64,7 +64,7 @@ def expenditures_graph():
     """
     title_section = "<b>Energy Expenditures by State</b>"
     clean_expenditures_data =  pd.read_csv(
-            "energy_states/eia_states_data/cleaned_data/cleaned_expenditures.txt"
+            "cody_bills/energy_states/eia_states_data/cleaned_data/cleaned_expenditures.txt"
 )
     #Comment on lines 20-23 describes .columns[2] & .columns[3]
     bar_graph = create_graph(clean_expenditures_data, 
@@ -87,7 +87,7 @@ def production_graph():
     """
     title_section = "<b>Energy Production by State</b>"
     clean_production_data =  pd.read_csv(
-            "energy_states/eia_states_data/cleaned_data/cleaned_production.txt"
+            "cody_bills/energy_states/eia_states_data/cleaned_data/cleaned_production.txt"
 )
     #Comment on lines 20-23 describes .columns[2] & .columns[3]
     bar_graph = create_graph(clean_production_data, 
@@ -122,7 +122,9 @@ def create_graph(data, y_variable, added_hover_variable, title_section):
 )
     
     #This moves the "Rank" column info ontop of the bar graph instead of inside
-    fig.update_traces(textposition = 'outside', textfont = dict(size = 12.5))
+    fig.update_traces(textposition = 'outside', textfont = dict(size = 12.5),
+            insidetextanchor = 'start')
+    # fig.update_traces(textfont = {"color": "white"})
     
     fig.update_layout(showlegend = False,  font = dict(size = 15),
             title = {"text": title_section
@@ -161,8 +163,8 @@ def create_graph_png(graph, path):
         graph (figure)
         path (string): A string to where the graph should be saved
     """
-    #Be sure to <$ pip3 install -U kaleido> to use the following line then 
-    # <$ pip3 uninstall -y kaleido> to prevent potential issues
+    #Need <$ pip3 install -U kaleido> to use the following lines then 
+    # <$ pip3 uninstall -y kaleido> if wish to uninstall
     graph_png = pio.to_image(graph, format = 'png')
     
     with open(path, "wb") as f:
@@ -175,15 +177,13 @@ def intialize_graph_pngs():
     create_graph_png function.
     """
     create_graph_png(consumed_graph(), 
-            "energy_states/eia_states_figures/consumed_graph.png")
+            "cody_bills/energy_states/eia_states_figures/consumed_graph.png")
     create_graph_png(emissions_graph(),
-            "energy_states/eia_states_figures/emissions_graph.png")
+            "cody_bills/energy_states/eia_states_figures/emissions_graph.png")
     create_graph_png(expenditures_graph(),
-            "energy_states/eia_states_figures/expenditures_graph.png")
+            "cody_bills/energy_states/eia_states_figures/expenditures_graph.png")
     create_graph_png(production_graph(),
-            "energy_states/eia_states_figures/production_graph.png")
+            "cody_bills/energy_states/eia_states_figures/production_graph.png")
 
-
-#run function from cd 30122-project-the-cody-bills within a poetry shell
-#   poetry run python energy_states/energy_dataviz.py
+#The following line is to initialize the functions to create the graph pngs
 intialize_graph_pngs()
