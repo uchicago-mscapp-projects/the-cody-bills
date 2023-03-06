@@ -180,9 +180,13 @@ def intialize_graph_pngs():
     create_graph_png(emissions_graph(),
             "cody_bills/energy_states/eia_states_figures/emissions_graph.png")
     create_graph_png(expenditures_graph(),
-            "cody_bills/energy_states/eia_states_figures/expenditures_graph.png")
+            "cody_bills/energy_states/eia_states_figures/expenditures_graph.png"
+)
     create_graph_png(production_graph(),
             "cody_bills/energy_states/eia_states_figures/production_graph.png")
 
 #The following line is to initialize the functions to create the graph pngs
 # intialize_graph_pngs()
+
+# if __name__ == "__main__":
+#     intialize_graph_pngs()
