@@ -188,5 +188,5 @@ def intialize_graph_pngs():
 #The following line is to initialize the functions to create the graph pngs
 # intialize_graph_pngs()
 
-# if __name__ == "__main__":
-#     intialize_graph_pngs()
+if __name__ == "__main__":
+    intialize_graph_pngs()
