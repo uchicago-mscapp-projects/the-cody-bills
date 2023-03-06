@@ -6,12 +6,49 @@ import plotly.express as px
 import dash_bootstrap_components as dbc
 from dash import Dash, html, dcc, Input, Output, get_asset_url, dash_table
 
-datatable_pennsylvania = pd.read_csv("cody_bills/assets/table_pennsylvania.txt")
-datatable_texas = pd.read_csv("cody_bills/assets/table_texas.txt")
 
+def process_input_json(json_file):
+    """
+    This function does a minor preprocessing of the input JSON file 
+    with the Energy Policy Index and metadata, in order to create a
+    dataframe ordered by the index.
+
+    Input:
+        json_file(json): the JSON file with the information
+    Returns:
+
+    """
+    with open(json_file, "r") as file:
+        df = pd.DataFrame(json.load(file))
+
+    df["Energy Policy Index"] = (df["Norm_EPol_Index"] * 100).round(4)
+    df.drop(columns = ["Norm_EPol_Index", "Bill ID", "State"], axis = 1, inplace = True)
+    df = df.sort_values(by = "Energy Policy Index", ascending = False)
+    df.rename(columns = {"url": "URL"}, inplace = True)
+
+    return df
+
+datatable_pennsylvania = process_input_json("cody_bills/assets/table_pennsylvania.json")
+datatable_texas = process_input_json("cody_bills/assets/table_texas.json")
+
+# Create dataframe table with descriptive statistics of the Energy Policy Index for each state
+descr_penn = datatable_pennsylvania.describe().rename(columns = 
+                        {"Energy Policy Index": "Pennsylvania"})
+descr_tex = datatable_texas.describe().rename(columns = 
+                        {"Energy Policy Index": "Texas"})
+descr_table = pd.concat([descr_penn, descr_tex], axis = 1)
+list_metrics = ["No. of bills", "Mean Average", "Standard Deviation", 
+                "Minimum", "25th Percentile", "Median", 
+                "75th percentile", "Maximum"]
+descr_table["Metric"] = list_metrics
+descr_table = descr_table[["Metric", "Pennsylvania", "Texas"]]
+descr_table[["Pennsylvania", "Texas"]] = descr_table[["Pennsylvania", "Texas"]].round(4)
+
+# Create tables without without the indexes with zeros
 datatable_pennsylvania_no_0 = datatable_pennsylvania[datatable_pennsylvania["Energy Policy Index"] > 0]
 datatable_texas_no_0 = datatable_texas[datatable_texas["Energy Policy Index"] > 0]
 
+# Import energy policy information for the barcharts
 total_energy_produced = pd.read_csv("cody_bills/assets/cleaned_production.txt")
 total_carbon_dioxide = pd.read_csv("cody_bills/assets/cleaned_emissions.txt")
 capita_energy_expenditure = pd.read_csv("cody_bills/assets/cleaned_expenditures.txt")
@@ -45,51 +82,42 @@ app.layout = html.Div([
             html.Br(),
             dbc.Row([
                 dbc.Col([
-                    html.H3("Tables - Bills Metadata and Index", style = {'textAlign': 'center'}),
-
-                    html.Br(),
-                    html.Div([
-                        dcc.Dropdown(
-                            options = ["Pennsylvania", "Texas"],
-                            value = "Pennsylvania",
-                            id = "table-dropdown",
-                            style = {'width': '100%', 'textAlign': 'center'}
-                        )
-                    ]),
+                    html.H3("Energy Policy Index - Descriptive Statistics", 
+                        style = {'textAlign': 'center'}),
 
                     html.Br(),
                     html.P("""
-                    The tables show the description, chamber (Senate or House),
-                    date of issue, the Energy Policy Index and the URL to access
-                    the original bill. It is sorted by the index from greatest to 
-                    lowest. 
-                    """, style = {'textAlign': 'left'}),
+                        This table shows some descriptive metrics calculated 
+                        for the Energy Policy Index. This way it is possible to 
+                        see the distribution of de index and its mean in each
+                        state. 
+                        """)
+                
                 ], width = 4),
 
-                # Column of table
                 dbc.Col([
                         dash_table.DataTable( 
-                        id = "data-table",
+                        descr_table.to_dict('records'),
                         page_size = 15,
                         fixed_rows = {'headers': True},
                         # filter_action = 'native',
                         style_cell = {"whiteSpace": "pre-line", 'textAlign': 'left'},
-                        style_table={'minWidth': '100%'},
+                        # style_table={'minWidth': '100%'},
                         style_data = {'minWidth': '100px', 'maxWidth': '400px', 'height': 'auto', 'overflowY': 'auto'} ,
                         # style_table = {'width': '75%', 'overflowY': 'auto'},
                         fill_width=False,
-                        style_cell_conditional = [
-                            {'if': {'column_id': 'Description'},
-                            'width': '400px'},
-                            {'if': {'column_id': 'Chamber'},
-                            'width': '100px'},
-                            {'if': {'column_id': 'Created Date'},
-                            'width': '200px%'},
-                            {'if': {'column_id': 'Energy Policy Index'},
-                            'width': '200px%'},
-                            {'if': {'column_id': 'url'},
-                            'width': '100px%'}
-                        ],
+                        # style_cell_conditional = [
+                        #     {'if': {'column_id': 'Description'},
+                        #     'width': '400px'},
+                        #     {'if': {'column_id': 'Chamber'},
+                        #     'width': '100px'},
+                        #     {'if': {'column_id': 'Created Date'},
+                        #     'width': '200px%'},
+                        #     {'if': {'column_id': 'Energy Policy Index'},
+                        #     'width': '200px%'},
+                        #     {'if': {'column_id': 'url'},
+                        #     'width': '100px%'}
+                        # ],
                         style_header={
                             'backgroundColor': 'green',
                             'color': 'white',
@@ -97,9 +125,10 @@ app.layout = html.Div([
                             'textAlign': 'center'
                             },
                     )
-                    
-                ], width = 8)
-            ], align='center'),
+
+                ], width = 8, style = {'textAlign': 'center'})
+
+            ]),
 
             html.Br(),
             dbc.Row([
@@ -206,6 +235,65 @@ app.layout = html.Div([
                         id = "barchart-graph-totals")], 
                         width=8),
 
+            ], align='center'),
+
+            html.Br(),
+            dbc.Row([
+                dbc.Col([
+                    html.H3("Tables - Bills Metadata and Index", style = {'textAlign': 'center'}),
+
+                    html.Br(),
+                    html.Div([
+                        dcc.Dropdown(
+                            options = ["Pennsylvania", "Texas"],
+                            value = "Pennsylvania",
+                            id = "table-dropdown",
+                            style = {'width': '100%', 'textAlign': 'center'}
+                        )
+                    ]),
+
+                    html.Br(),
+                    html.P("""
+                    The tables show the description, chamber (Senate or House),
+                    date of issue, the Energy Policy Index and the URL to access
+                    the original bill. It is sorted by the index from greatest to 
+                    lowest. 
+                    """, style = {'textAlign': 'left'}),
+                ], width = 4),
+
+                # Column of table
+                dbc.Col([
+                        dash_table.DataTable( 
+                        id = "data-table",
+                        page_size = 15,
+                        fixed_rows = {'headers': True},
+                        # filter_action = 'native',
+                        style_cell = {"whiteSpace": "pre-line", 'textAlign': 'left'},
+                        style_table={'minWidth': '100%'},
+                        style_data = {'minWidth': '100px', 'maxWidth': '400px', 'height': 'auto', 'overflowY': 'auto'} ,
+                        # style_table = {'width': '75%', 'overflowY': 'auto'},
+                        fill_width=False,
+                        style_cell_conditional = [
+                            {'if': {'column_id': 'Description'},
+                            'width': '400px'},
+                            {'if': {'column_id': 'Chamber'},
+                            'width': '100px'},
+                            {'if': {'column_id': 'Created Date'},
+                            'width': '200px%'},
+                            {'if': {'column_id': 'Energy Policy Index'},
+                            'width': '200px%'},
+                            {'if': {'column_id': 'url'},
+                            'width': '100px%'}
+                        ],
+                        style_header={
+                            'backgroundColor': 'green',
+                            'color': 'white',
+                            'fontWeight': 'bold',
+                            'textAlign': 'center'
+                            },
+                    )
+                    
+                ], width = 8)
             ], align='center')
 
 
