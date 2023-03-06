@@ -59,7 +59,7 @@ MASK = 255 * MASK.astype(int)
 
 
 #### filenames ###
-TX_from = "pdf_links_texas.json"
+TX_from = "cody_bills/Text_Preprocessing/bills_texas.json"
 PA_from = "cody_bills/Text_Preprocessing/bills_pennsylvania.json"
 
 TX_to_table = "cody_bills/assets/table_texas.json"
