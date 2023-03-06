@@ -33,16 +33,15 @@ datatable_texas = process_input_json("cody_bills/assets/table_texas.json")
 
 # Create dataframe table with descriptive statistics of the Energy Policy Index for each state
 descr_penn = datatable_pennsylvania.describe().rename(columns = 
-                        {"Energy Policy Index": "Pennsylvania"})
+                        {"Energy Policy Index": "Pennsylvania"}).round(4)
 descr_tex = datatable_texas.describe().rename(columns = 
-                        {"Energy Policy Index": "Texas"})
-descr_table = pd.concat([descr_penn, descr_tex], axis = 1)
-list_metrics = ["No. of bills", "Mean Average", "Standard Deviation", 
+                        {"Energy Policy Index": "Texas"}).round(4)
+descr_table = pd.concat([descr_penn, descr_tex], axis = 1).T.reset_index()
+list_metrics = ["State", "No. of bills", "Mean", "Standard Deviation", 
                 "Minimum", "25th Percentile", "Median", 
                 "75th percentile", "Maximum"]
-descr_table["Metric"] = list_metrics
-descr_table = descr_table[["Metric", "Pennsylvania", "Texas"]]
-descr_table[["Pennsylvania", "Texas"]] = descr_table[["Pennsylvania", "Texas"]].round(4)
+
+descr_table.columns = list_metrics
 
 # Create tables without without the indexes with zeros
 datatable_pennsylvania_no_0 = datatable_pennsylvania[datatable_pennsylvania["Energy Policy Index"] > 0]
@@ -99,12 +98,15 @@ app.layout = html.Div([
                         dash_table.DataTable( 
                         descr_table.to_dict('records'),
                         page_size = 15,
-                        fixed_rows = {'headers': True},
+                        # fixed_rows = {'headers': True},
                         # filter_action = 'native',
-                        style_cell = {"whiteSpace": "pre-line", 'textAlign': 'left'},
+                        # style_cell = {"whiteSpace": "pre-line", 'textAlign': 'left'},
                         # style_table={'minWidth': '100%'},
-                        style_data = {'minWidth': '100px', 'maxWidth': '400px', 'height': 'auto', 'overflowY': 'auto'} ,
-                        # style_table = {'width': '75%', 'overflowY': 'auto'},
+                        # style_data = {'minWidth': '100px', 'maxWidth': '400px', 'height': 'auto', 'overflowY': 'auto'} ,
+                        # style_table = {'width': '100%'},
+                        style_table = {'width': '100%', 'overflowY': 'auto'},
+
+                        style_data = {'textAlign': 'center'},
                         fill_width=False,
                         # style_cell_conditional = [
                         #     {'if': {'column_id': 'Description'},
