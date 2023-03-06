@@ -77,28 +77,10 @@ app.layout = html.Div([
                         dash_table.DataTable( 
                         descr_table.to_dict('records'),
                         page_size = 15,
-                        # fixed_rows = {'headers': True},
-                        # filter_action = 'native',
-                        # style_cell = {"whiteSpace": "pre-line", 'textAlign': 'left'},
-                        # style_table={'minWidth': '100%'},
-                        # style_data = {'minWidth': '100px', 'maxWidth': '400px', 'height': 'auto', 'overflowY': 'auto'} ,
-                        # style_table = {'width': '100%'},
                         style_table = {'width': '100%', 'overflowY': 'auto'},
-
                         style_data = {'textAlign': 'center'},
                         fill_width=False,
-                        # style_cell_conditional = [
-                        #     {'if': {'column_id': 'Description'},
-                        #     'width': '400px'},
-                        #     {'if': {'column_id': 'Chamber'},
-                        #     'width': '100px'},
-                        #     {'if': {'column_id': 'Created Date'},
-                        #     'width': '200px%'},
-                        #     {'if': {'column_id': 'Energy Policy Index'},
-                        #     'width': '200px%'},
-                        #     {'if': {'column_id': 'url'},
-                        #     'width': '100px%'}
-                        # ],
+
                         style_header={
                             'backgroundColor': 'green',
                             'color': 'white',
@@ -137,7 +119,6 @@ app.layout = html.Div([
                 dbc.Col([
                     dcc.Graph(
                         id = "histogram-graph")
-                        # id = "histogram-graph")], style={'width': '70%', 'display': 'inline-block'})
                     
                 ], width=8)
             ], align='center'),
@@ -355,7 +336,6 @@ def get_histogram(state):
     return fig
 
 
-
 @app.callback(
     Output(component_id = "wordcloud-pennsylvania", component_property = "src"),
     Input(component_id = "wordcloud-dropdown", component_property = "value")
@@ -424,7 +404,6 @@ def graph_barchart(subject):
         hover_data = [added_hover_variable]
         )
 
-    # fig.update_traces(textposition = 'outside')
     fig.update_traces(textfont = {"color": "white"})
     
     fig.update_layout(showlegend = False,  font = dict(size = 15),
