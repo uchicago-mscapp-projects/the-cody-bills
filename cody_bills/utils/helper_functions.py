@@ -15,6 +15,7 @@ def process_input_json(json_file):
 
     Input:
         json_file(json): the JSON file with the information
+
     Returns:
         df(Pandas DataFrame): dataframe ready to use in visualization
 
@@ -53,7 +54,9 @@ def display_wordclouds(ngram_type, state):
 
     else:
         image_path = "cody_bills/assets/bigrams_texas.png"
-    
+
+    # The below code was found from this source
+    # # https://community.plotly.com/t/how-to-embed-images-into-a-dash-app/61839
     encoded_image = base64.b64encode(open(image_path, 'rb').read())
 
     return 'data:image/png;base64,{}'.format(encoded_image.decode())
@@ -66,11 +69,11 @@ def get_histogram(dropdown_select, datatable):
     
     Inputs: 
         dropdown_select(str): state selected by user in the dropdown selection, 
+
             specifying if graph should not include bills where no keyword was found.
     Returns: 
         fig(Plotly Express Figure): the histogram graph figure
             from Plotly Express
-        
     """
     if dropdown_select.startswith("Pennsylvania"):
         color_bar = ["mediumpurple"]
