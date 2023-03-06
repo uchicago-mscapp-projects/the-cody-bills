@@ -1,3 +1,10 @@
+######################################
+##  Author: Santiago Satizabal     ###
+##  email: ssatizabal@uchicago.edu ##
+#####################################
+
+## TEXT PROCESSING ANALYSIS ##
+
 #### Libraries #####
 import json
 import re
@@ -226,7 +233,8 @@ def append_and_normalize_index(dict_lst_TX, dict_lst_PA):
 
     return (df_both_states, pennsylvania_norm_list, texas_norm_list)
 
-def get_histogram(df_state_norm, state, with_0):
+
+def get_histogram(df_state_norm, state):
     """
     Generates a histogram for each state following the distribution of the Normalized Energy
     Policy Index depending on some conditions to use on the dashboard:
@@ -236,7 +244,7 @@ def get_histogram(df_state_norm, state, with_0):
             with_0: If True includes observations with 0 in the normalized Energy policy Index
                     (bool)
     """
-    if state == "Pennsylvania" and with_0:
+    if state == "Pennsylvania":
         fig = px.histogram(df_state_norm, 
                         x = "Norm_EPol_Index",
                         labels = {"Norm_EPol_Index": "Norm. Energy Policy Index"},
@@ -244,7 +252,7 @@ def get_histogram(df_state_norm, state, with_0):
                         pattern_shape_sequence = ["+"],
                         nbins = 20,
                         hover_data=df_state_norm.columns)
-    elif state == "Pennsylvania" and not with_0:
+    elif state == "Pennsylvania - No Zeros":
         fig = px.histogram(df_state_norm[df_state_norm["Norm_EPol_Index"] > 0], 
                         x = "Norm_EPol_Index",
                         labels = {"Norm_EPol_Index": "Norm. Energy Policy Index"}, 
@@ -252,7 +260,7 @@ def get_histogram(df_state_norm, state, with_0):
                         pattern_shape_sequence = ["+"],
                         nbins = 50,
                         hover_data=df_state_norm.columns)
-    elif state == "Texas" and with_0:
+    elif state == "Texas":
         fig = px.histogram(df_state_norm, 
                         x = "Norm_EPol_Index",
                         labels = {"Norm_EPol_Index": "Norm. Energy Policy Index"},
