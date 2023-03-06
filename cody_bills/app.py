@@ -60,8 +60,9 @@ app.layout = html.Div([
                     html.Br(),
                     html.P("""
                     The tables show the description, chamber (Senate or House),
-                    date of issue, the Energy Policy Index. It is sorted by the index from 
-                    greater to lowest. 
+                    date of issue, the Energy Policy Index and the URL to access
+                    the original bill. It is sorted by the index from greatest to 
+                    lowest. 
                     """, style = {'textAlign': 'left'}),
                 ], width = 4),
 
@@ -117,7 +118,8 @@ app.layout = html.Div([
                     html.Br(),
                     html.P("""
                         The histograms show the distribution of the Energy Policy
-                        Index, for each state.
+                        Index, for each state, and with the option of not showing 
+                        the bills that contained no keywords (option "No Zeros").
                     
                     """, style = {'textAlign': 'left'}),
                 ], width = 4),
@@ -188,7 +190,14 @@ app.layout = html.Div([
                         id = "barchart-dropdown",
                         style={'width': '100%', 'textAlign': 'center'}
                         ),
-                    html.Br()
+
+                    html.Br(),
+                    html.P("""
+                        There are 4 variables related to energy policy, which are presented 
+                        in each bar chart for each state. The graphs also show the ranking
+                        of the state, compared to every US state. Each variable is selected 
+                        from the above dropdown. 
+                        """)
 
                 ], width=4),
 
@@ -239,6 +248,7 @@ def get_histogram(state):
                         pattern_shape_sequence = ["+"],
                         nbins = 40,
                         hover_data = datatable_pennsylvania.columns)
+        title_section = "<b>Histogram Pennsylvania</b>"
 
     elif state == "Pennsylvania - No Zeros":
         fig = px.histogram(datatable_pennsylvania_no_0, 
@@ -246,7 +256,8 @@ def get_histogram(state):
                         color_discrete_sequence = ["mediumpurple"],
                         pattern_shape_sequence = ["+"],
                         nbins = 50,
-                        hover_data=datatable_pennsylvania_no_0.columns)
+                        hover_data = datatable_pennsylvania_no_0.columns)
+        title_section = "<b>Histogram Pennsylvania - No Zeros</b>"
 
     elif state == "Texas":
         fig = px.histogram(datatable_texas, 
@@ -254,7 +265,9 @@ def get_histogram(state):
                         color_discrete_sequence = ["red"],
                         pattern_shape_sequence = ["x"],
                         nbins = 40,
-                        hover_data=datatable_texas.columns)
+                        hover_data = datatable_texas.columns)
+        title_section = "<b>Histogram Texas</b>"
+
 
     elif state == "Texas - No Zeros":
         fig = px.histogram(datatable_texas_no_0, 
@@ -262,9 +275,16 @@ def get_histogram(state):
                         color_discrete_sequence = ["red"],
                         pattern_shape_sequence = ["x"],
                         nbins = 50,
-                        hover_data=datatable_pennsylvania_no_0.columns)
+                        hover_data = datatable_pennsylvania_no_0.columns)
+        title_section = "<b>Histogram Texas - No Zeros</b>"
+
+    fig.update_layout(showlegend = False,  font = dict(size = 15),
+            title = {"text": title_section
+            , "y": 0.95, "x": 0.5, "xanchor": "center", "yanchor": "top"}
+            )
     
     return fig
+
 
 
 @app.callback(
@@ -338,9 +358,10 @@ def graph_barchart(subject):
     # fig.update_traces(textposition = 'outside')
     fig.update_traces(textfont = {"color": "white"})
     
-    fig.update_layout(showlegend = False,  font = dict(size = 17),
+    fig.update_layout(showlegend = False,  font = dict(size = 15),
             title = {"text": title_section
-            , "y": 0.96, "x": 0.5, "xanchor": "center", "yanchor": "top"}
+            , "y": 0.95, "x": 0.5, "xanchor": "center", "yanchor": "top"},
+            yaxis = dict(title = y_variable, title_font = dict(size = 16))
             )
 
     return fig
