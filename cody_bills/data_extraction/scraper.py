@@ -85,9 +85,12 @@ def get_bill_dict(bill):
     bill_dict["title"] = bill["title"]
     bill_dict["chamber"] = bill["from_organization"]["name"]
     bill_dict["created_date"] = bill["created_at"][:10] # just year, month, day
-    text, url = get_bill_text(bill)
-    bill_dict["link"] = url
-    bill_dict["text"] = text
+    try:
+        text, url = get_bill_text(bill)
+        bill_dict["link"] = url
+        bill_dict["text"] = text
+    except:
+        return False
 
     return bill_dict
 
@@ -103,7 +106,6 @@ def get_bill_text(bill):
         text (str): The plain text of the bill.
     '''
     if is_html_available(bill):
-        print("available")
         text, url = get_html_text(bill)
     else:
         text, url = get_pdf_text(bill)
@@ -236,6 +238,6 @@ def scraper(states, date, key):
 
 if __name__ == "__main__":
     KEY = read_key("cody_bills/data_extraction/key.txt") # getting key from local directory
-    STATES = ["Texas", "Illinois"] # one state for html and one for pdf
+    STATES = ["Texas", "Pennsylvania", "Illinois"] # one state for html and one for pdf
     DATE_CREATED = "2022-01-01" # for bills created 2022-latest data
     scraper(STATES, DATE_CREATED, KEY)
