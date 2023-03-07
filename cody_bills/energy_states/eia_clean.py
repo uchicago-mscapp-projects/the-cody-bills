@@ -1,6 +1,5 @@
 import pandas as pd
 from cody_bills.energy_states import states_dict
-
 #run function from cd 30122-project-the-cody-bills within a poetry shell
 #   python -m cody_bills.energy_states.eia_clean
 

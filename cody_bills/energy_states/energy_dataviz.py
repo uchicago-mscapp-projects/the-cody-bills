@@ -2,7 +2,7 @@ import plotly.express as px
 import plotly.io as pio
 import pandas as pd
 #run function from cd 30122-project-the-cody-bills within a poetry shell
-#    python -m cody_bills.energy_states.energy_dataviz
+#   python -m cody_bills.energy_states.energy_dataviz
 
 def consumed_graph():
     """
