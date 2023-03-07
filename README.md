@@ -23,7 +23,7 @@ Is a state's legislation highly related to that state's main economic activities
     c) To clean up the energy indicators data and save it, run ``python -m cody_bills.energy_states.eia_clean``. To generate the graphs comparing the states across several Energy policy indicators and save them into figures, first ``pip3 install -U kaleido``, second in cody_bills/energy_states/energy_dataviz.py uncomment lines 189-192, and third run ``python -m cody_bills.energy_states.energy_dataviz``. 
         <em>Note:</em> To run the the app.py you do not need to generate the bar graphs via these steps, these 3 steps are only if the user wishes to save new png bar graphs in cody_bills/energy_states/eia_states_figures for reference.  
 
-## The Energy Policy Index - design and interpretation
+## The Energy Policy Index
  The Energy Policy Index ranges from 0 to 100 and shows each bill's relative implementation of energy policy. It was created using a sliding window algorithm on each bill, where each keyword (a word or a bigram) was searched inside each window, and if found, a counter was added by 1. In the case of the bigrams, a 1 was added to the counter only if both the words composing it were found in the window. Subsequently, the counter was divided by the number of words in the bill to compare longer and shorter bills with greater ease. Finally, when the counter for each bill was computed, both in Pennsylvania and Texas, all of the counters were normalized with a min-max function, where the bills with no keywords in them would have a value of 0, and the one with most keywords would have a value of 100.
 
 ## Interacting with the Dashboard
