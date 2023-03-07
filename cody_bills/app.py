@@ -35,7 +35,6 @@ datatable_texas_no_0 = datatable_texas[datatable_texas["Energy Policy Index"] > 
 app = Dash(external_stylesheets=[dbc.themes.SIMPLEX])
 # app layout, whole design goes here
 app.layout = html.Div([
-    # Inside Dash Card for margin creation
     dbc.Card(
         dbc.CardBody([  
             # Dashboard Explanation
@@ -47,21 +46,27 @@ app.layout = html.Div([
 
                     html.Br(),
                     html.P(""" 
-                        This dashboard presents graphs and a table 
+                        This dashboard presents graphs and tables 
                         that show the results of the Energy Policy 
                         Index, calculated as a normalized frequency found
-                        in legislative bills from Pennsylvania and Texas.
-                        The results of the index are presented in a 
-                        table and histograms, for each state. There are 
-                        also clouds of the most frequent words and bigrams of 
-                        the bills for each state, and descriptive graphs 
-                        per state concerning different official energy 
-                        metrics. 
-                    """),
-                    html.Br()
-                ]),
-            ]),
+                        in legislative bills from Pennsylvania and Texas. 
+                        It also shows clouds of the most frequent words and 
+                        bigrams of the bills for each state, and 
+                        descriptive graphs per state concerning different 
+                        official energy metrics, as well as a table with 
+                        the metadata and index of each bill. 
 
+                        The Energy Policy Index ranges from 0 to 100. 
+                        A bill with an index of 0 has no keywords related 
+                        to energy policy. The greater the index, the more 
+                        related it is with energy policy. The bill with 
+                        an index of 100 has the most keywords (relative 
+                        to its size) related to energy policy. 
+                    """),
+                    html.Br(),
+                ]),  
+            ]),
+            
             html.Br(),
             # Descriptive Statistics of the Energy Index
             dbc.Row([
