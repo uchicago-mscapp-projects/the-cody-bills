@@ -1,3 +1,7 @@
+#########################################################
+#####   This code was written by John Christenson   ##### 
+#########################################################
+
 def dict_us_statesanddc():
     """
     A dictionary of the U.S. states and DC, with the key being the state

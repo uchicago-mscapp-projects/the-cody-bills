@@ -20,7 +20,7 @@ Is a state's legislation highly related to that state's main economic activities
 
     b) To clean the bills and conduct the text analysis (word-clouds and Energy Policy index calculation), run ``python -m cody_bills.Text_Preprocessing.text_analysis``
 
-    c) To clean up the energy indicators data and save it, run ``python -m cody_bills.energy_states.eia_clean``. To generate the graphs comparing the states across several Energy policy indicators and save them into figures, first ``pip3 install -U kaleido``, second in cody_bills/energy_states/energy_dataviz.py uncomment lines 189-192, and third run ``python -m cody_bills.energy_states.energy_dataviz``. 
+    c) To clean up the energy indicators data and save it, run ``python -m cody_bills.energy_states.eia_clean``. To generate the graphs comparing the states across several Energy policy indicators and save them into figures, first ``pip3 install -U kaleido``, second in cody_bills/energy_states/energy_dataviz.py uncomment lines 195-198, and third run ``python -m cody_bills.energy_states.energy_dataviz``. 
         <em>Note:</em> To run the the app.py you do not need to generate the bar graphs via these steps, these 3 steps are only if the user wishes to save new png bar graphs in cody_bills/energy_states/eia_states_figures for reference.  
 
 ## The Energy Policy Index
