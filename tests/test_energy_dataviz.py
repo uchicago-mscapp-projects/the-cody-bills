@@ -1,3 +1,7 @@
+#########################################################
+#####   This code was written by John Christenson   ##### 
+#########################################################
+
 from cody_bills.energy_states.energy_dataviz import consumed_graph
 from cody_bills.energy_states.energy_dataviz import emissions_graph
 from cody_bills.energy_states.energy_dataviz import expenditures_graph 

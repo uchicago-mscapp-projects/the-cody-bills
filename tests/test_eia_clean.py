@@ -1,3 +1,7 @@
+#########################################################
+#####   This code was written by John Christenson   ##### 
+#########################################################
+
 from cody_bills.energy_states.eia_clean import clean_consumed_data
 from cody_bills.energy_states.eia_clean import clean_emissions_data
 from cody_bills.energy_states.eia_clean import clean_expenditures_data
