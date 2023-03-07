@@ -1,3 +1,4 @@
+# written by Manuel Mendez
 import json
 import os
 import requests
@@ -8,7 +9,7 @@ from PyPDF2 import PdfReader
 from io import BytesIO
 
 # to run this file, one has to open an account in Open States and use 
-# their key which comes in the profile
+# the key which comes in the profile
 
 def get_page_number(state):
     '''
@@ -214,7 +215,7 @@ def scraper(states, date, key):
         page = get_page_number(state)
 
         bills_dictionary = dict()
-        while True:
+        while True: # this can be changed for testing the code to a few number of pages
             url = get_url(state, DATE_CREATED, page, KEY)
             request1 = requests.get(url)
             bills_lst = json.loads(request1.text)["results"]
