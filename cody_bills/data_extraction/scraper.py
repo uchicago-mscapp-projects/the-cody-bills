@@ -126,8 +126,6 @@ def is_html_available(bill):
         for link in version["links"]:
             if link["media_type"] == "text/html":
                 return True
-            else:
-                continue
 
     return False
 
@@ -201,13 +199,13 @@ def scraper(states, date, key):
     day are limited. This ensures that the scraping can continue from where it left
     off the next day with the same key in the page where it finished the previous day.
 
-    Parameters:
+    Inputs:
         states (list): a list of states to scrape bills data for
         date (str): the created date to get the bills since (in yyyy-mm-dd format)
         key (str): the API key to use for making requests to openstates API
 
     Returns:
-        None
+        Nothing - creates the json and txt files in the directory
     '''
     for state in STATES:
         # Creating a page file and number in case the requests per day are 
