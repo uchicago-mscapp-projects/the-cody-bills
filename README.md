@@ -15,7 +15,7 @@ Is the legislation of a state highly related to the main economic activities of 
 
 4)  If you want to recreate the intermediate steps
 
-    a) To collect the Bills we used for Pennsylvania and Texas, run ``line of code``
+    a) To collect the Bills we used for Pennsylvania and Texas, run ``python -m cody_bills.data_extraction.scraper``
 
     b) To clean the bills and conduct the text analysis (word-clouds and Energy Policy index calculation), run ``python -m cody_bills.Text_Preprocessing.text_analysis``
 
