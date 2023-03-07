@@ -16,10 +16,11 @@ Is a state's legislation highly related to that state's main economic activities
 4)  If you want to recreate the intermediate steps
 
     a) To collect the Bills we used for Pennsylvania and Texas, run ``python -m cody_bills.data_extraction.scraper``
+        <em>Note:</em> For both states, text/html were available, but the code for pdfs is included in the implementation. This code was used to provide the sample for Illinois that is available in the data_extraction directory, along with samples for Pennsylvania and Texas. The scraper file runs for more than an hour or until the apikey runs out of requests, so an alternative is to change line 217 to "for page in range(X):" where X is a reduced amount of pages to request from the Open States API. Each page has 20 bills
 
     b) To clean the bills and conduct the text analysis (word-clouds and Energy Policy index calculation), run ``python -m cody_bills.Text_Preprocessing.text_analysis``
 
-    c) To clean up the energy indicators data and save it, run ``python -m cody_bills.energy_states.eia_clean``. To generate the graphs comparing the states across several Energy policy indicators and save them into figures, first ``pip3 install -U kaleido``, second in cody_bills/energy_states/energy_dataviz.py uncomment lines 189-192, and third run ``python -m cody_bills.energy_states.energy_dataviz``.  Note: to run the the app.py you do not need to generate the bar graphs, those 3 steps are only if the user wishes to save new png bar graphs in cody_bills/energy_states/eia_states_figures for reference.  
+    c) To clean up the energy indicators data and save it, run ``python -m cody_bills.energy_states.eia_clean``. To generate the graphs comparing the states across several Energy policy indicators and save them into figures, first ``pip3 install -U kaleido``, second in cody_bills/energy_states/energy_dataviz.py uncomment lines 189-192, and third run ``python -m cody_bills.energy_states.energy_dataviz``.  Note: to run the the app.py you do not need to generate the bar graphs via these steps, these 3 steps are only if the user wishes to save new png bar graphs in cody_bills/energy_states/eia_states_figures for reference.  
 
 ## Interacting with the Dashboard
 
