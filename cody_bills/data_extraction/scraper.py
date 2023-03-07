@@ -85,7 +85,7 @@ def get_bill_dict(bill):
     bill_dict["title"] = bill["title"]
     bill_dict["chamber"] = bill["from_organization"]["name"]
     bill_dict["created_date"] = bill["created_at"][:10] # just year, month, day
-    try:
+    try: # this is used for the case where a specific pdf or text/html scrape does not work
         text, url = get_bill_text(bill)
         bill_dict["link"] = url
         bill_dict["text"] = text
@@ -216,7 +216,7 @@ def scraper(states, date, key):
         page = get_page_number(state)
 
         bills_dictionary = dict()
-        for i in range(1):
+        while True:
             url = get_url(state, DATE_CREATED, page, KEY)
             request1 = requests.get(url)
             bills_lst = json.loads(request1.text)["results"]
