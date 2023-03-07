@@ -1,7 +1,7 @@
 # The Cody Bills: 
 ## Analyzing The Energy Policy of US states largest energy producers
 
-Is the legislation of a state highly related to the main economic activities of that state? We do not intend to entirely answer this question but in this project, we explore a framework to analyze the frequency in which a specific topic or policy field was discussed in the bills proposed in any state in the U.S. As a case study, we chose energy policy and the states of Texas and Pennsylvania. These two states were the two main energy producer states in 2020 with 23,329 trillion btu and 9,492 trillion btu per the *U.S. Energy Information Administration (EIA)*. To collect the bills, we relied on the *OpenStates* website (https://openstates.org/) which allowed us to scrap all the state bills proposed by Texas’ and Pennsylvania’s congressional representatives since 2022. We use a simple sliding window algorithm to measure the presence of a list of energy-policy-related key words or ngrams we created following the EIA glossary (https://www.eia.gov/tools/glossary/). More specifically, we calculate a Normalized Energy Policy Index for each bill depending on the number of times each key word or ngram appear in its text. This information is displayed in a dashboard alongside relevant Energy production/consumption indicators (e.g. Energy expenditure per capita or energy consumption percapita) we collected from  EIA (https://www.eia.gov/state/rankings) to have a more complete context. 
+Is the legislation of a state highly related to the main economic activities of that state? We do not intend to entirely answer this question but in this project, we explore a framework to analyze the frequency in which a specific topic or policy field was discussed in the bills proposed in any state in the U.S. As a case study, we chose energy policy and the states of Texas and Pennsylvania. These two states were the two main energy producer states in 2020 with 23,329 trillion btu and 9,492 trillion btu per the *U.S. Energy Information Administration (EIA)*. To collect the bills, we relied on the *OpenStates* website (https://openstates.org/) which allowed us to scrap all the state bills proposed by Texas’ and Pennsylvania’s congressional representatives since 2022. We use a simple sliding window algorithm to measure the presence of a list of energy-policy-related key words or ngrams we created following the EIA glossary (https://www.eia.gov/tools/glossary/). More specifically, we calculate a Normalized Energy Policy Index for each bill depending on the number of times each key word or ngram appear in its text. This information is displayed in a dashboard alongside relevant energy production, energy consumption, energy expenditure, and carbon dioxide emission indicators (e.g. energy expenditure per capita or energy consumption per capita) we collected from EIA (https://www.eia.gov/state/rankings) to have a more complete context. 
 
 ## Getting Started 
 
@@ -15,11 +15,11 @@ Is the legislation of a state highly related to the main economic activities of 
 
 4)  If you want to recreate the intermediate steps
 
-    a) To collect the Bills we used for Pennsylvania and Texas, run ``line of code``
+    a) To collect the Bills we used for Pennsylvania and Texas, run ``python -m cody_bills.data_extraction.scraper``
 
     b) To clean the bills and conduct the text analysis (word-clouds and Energy Policy index calculation), run ``python -m cody_bills.Text_Preprocessing.text_analysis``
 
-    c) To clean up the energy indicators data and save it, run ``poetry run python cody_bills/energy_states/eia_clean.py``. To generate the graphs comparing the states across several Energy policy indicators and saves them into figures, run ``poetry run python cody_bills/energy_states/energy_dataviz.py``
+    c) To clean up the energy indicators data and save it, run ``python -m cody_bills.energy_states.eia_clean``. To generate the graphs comparing the states across several Energy policy indicators and save them into figures, first ``pip3 install -U kaleido``, second in cody_bills/energy_states/energy_dataviz.py uncomment lines 189-192, and third run ``python -m cody_bills.energy_states.energy_dataviz``.  Note: to run the the app.py one does note need to generate the bar graphs, those 3 steps are only if the user wishes to save new png bar graphs in cody_bills/energy_states/eia_states_figures for reference.  
 
 ## Interacting with the Dashboard
 

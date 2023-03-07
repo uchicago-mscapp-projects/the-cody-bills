@@ -1,8 +1,7 @@
 import pandas as pd
 from cody_bills.energy_states import states_dict
-
 #run function from cd 30122-project-the-cody-bills within a poetry shell
-#   poetry run python cody_bills/energy_states/eia_clean.py
+#   python -m cody_bills.energy_states.eia_clean
 
 
 def clean_consumed_data():
@@ -136,4 +135,9 @@ def save_all_cleaned():
             "cody_bills/energy_states/eia_states_data/cleaned_data/cleaned_production.txt"
 )
 
+
 save_all_cleaned()
+
+
+if __name__ == "__main__":
+    save_all_cleaned()
