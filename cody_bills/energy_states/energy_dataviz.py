@@ -1,6 +1,11 @@
+#########################################################
+#####   This code was written by John Christenson   ##### 
+#########################################################
+
 import plotly.express as px
 import plotly.io as pio
 import pandas as pd
+
 #run function from cd 30122-project-the-cody-bills within a poetry shell
 #   python -m cody_bills.energy_states.energy_dataviz
 
@@ -43,7 +48,7 @@ def emissions_graph():
     clean_emissions_data =  pd.read_csv(
             "cody_bills/energy_states/eia_states_data/cleaned_data/cleaned_emissions.txt"
 )
-    #Comment on lines 20-23 describes .columns[2] & .columns[3]
+    #Comment on lines 25-28 describes .columns[2] & .columns[3]
     bar_graph = create_graph(clean_emissions_data, 
             clean_emissions_data.columns[3], 
             clean_emissions_data.columns[2], 
@@ -66,7 +71,7 @@ def expenditures_graph():
     clean_expenditures_data =  pd.read_csv(
             "cody_bills/energy_states/eia_states_data/cleaned_data/cleaned_expenditures.txt"
 )
-    #Comment on lines 20-23 describes .columns[2] & .columns[3]
+    #Comment on lines 25-28 describes .columns[2] & .columns[3]
     bar_graph = create_graph(clean_expenditures_data, 
             clean_expenditures_data.columns[2], 
             clean_expenditures_data.columns[3], 
@@ -89,7 +94,7 @@ def production_graph():
     clean_production_data =  pd.read_csv(
             "cody_bills/energy_states/eia_states_data/cleaned_data/cleaned_production.txt"
 )
-    #Comment on lines 20-23 describes .columns[2] & .columns[3]
+    #Comment on lines 25-28 describes .columns[2] & .columns[3]
     bar_graph = create_graph(clean_production_data, 
             clean_production_data.columns[3], 
             clean_production_data.columns[2], 
@@ -122,8 +127,8 @@ def create_graph(data, y_variable, added_hover_variable, title_section):
 )
     
     #This moves the "Rank" column info ontop of the bar graph instead of inside
-    fig.update_traces(textposition = 'outside', textfont = dict(size = 12.5),
-            insidetextanchor = 'start')
+    fig.update_traces(textposition = "outside", textfont = dict(size = 12.5),
+            insidetextanchor = "start")
     
     fig.update_layout(showlegend = False,  font = dict(size = 15),
             title = {"text": title_section
@@ -173,7 +178,8 @@ def create_graph_png(graph, path):
 def intialize_graph_pngs():
     """
     Intialize each bar graph function and input the result into the 
-    create_graph_png function.
+    create_graph_png function.  This function is to provide readily
+    available png bar graphs and is not used in the creation of the Dash.
     """
     create_graph_png(consumed_graph(), 
             "cody_bills/energy_states/eia_states_figures/consumed_graph.png")
@@ -185,7 +191,7 @@ def intialize_graph_pngs():
     create_graph_png(production_graph(),
             "cody_bills/energy_states/eia_states_figures/production_graph.png")
 
-#The following line is to initialize the functions to create the graph pngs
+##The following line is to initialize the functions to create the graph pngs
 # intialize_graph_pngs()
 
 # if __name__ == "__main__":
