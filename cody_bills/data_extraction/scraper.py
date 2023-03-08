@@ -12,7 +12,7 @@ from io import BytesIO
 # the key which comes in the profile
 
 def get_page_number(state):
-    '''
+    """
     Gets the current page number for a given state from a file.
 
     Inputs:
@@ -20,7 +20,7 @@ def get_page_number(state):
 
     Returns:
         page (int): the current page number for the given state
-    '''
+    """
     page_path = Path(f"cody_bills/data_extraction/page_{state}.txt")
     if not page_path.is_file():
         with open(f"cody_bills/data_extraction/page_{state}.txt", "w") as f:
@@ -31,8 +31,9 @@ def get_page_number(state):
     
     return page
 
+
 def read_key(key_file_path):
-    '''
+    """
     Reads the OpenStates API key from a file and returns it as a string.
 
     Inputs:
@@ -40,13 +41,14 @@ def read_key(key_file_path):
 
     Returns:
         key (str): The API key as a string.
-    '''
+    """
     with open(key_file_path, "r") as f:
         key = f.read()
     return key
 
+
 def get_url(state, date, page_num, key):
-    '''
+    """
     Constructs and returns a URL for querying bills from the Open States API.
 
     Inputs:
@@ -58,15 +60,16 @@ def get_url(state, date, page_num, key):
     Returns:
         url (str): The URL for querying bills from the Open States API with 
          the specifications.
-    '''
+    """
     url = (f"https://v3.openstates.org/bills?jurisdiction={state}&created_since={date}"
                f"&sort=updated_desc&include=versions&page={page_num}"
                f"&per_page=20&apikey=" + key)
 
     return url
 
+
 def get_bill_dict(bill):
-    '''
+    """
     Extracts information from a bill object and returns a dictionary containing 
      relevant data.
     
@@ -76,8 +79,7 @@ def get_bill_dict(bill):
     Returns:
         bill_dict (dict): A dictionary containing the information about the bill 
          including the text.
-    '''
-
+    """
     if not bill["versions"]: # only getting bills that have links
         return False
     bill_dict = dict()
@@ -95,8 +97,9 @@ def get_bill_dict(bill):
 
     return bill_dict
 
+
 def get_bill_text(bill):
-    '''
+    """
     Returns the plain text of a legislative bill, which is obtained from either 
      an HTML or PDF link.
     
@@ -105,7 +108,7 @@ def get_bill_text(bill):
 
     Returns:
         text (str): The plain text of the bill.
-    '''
+    """
     if is_html_available(bill):
         text, url = get_html_text(bill)
     else:
@@ -113,8 +116,9 @@ def get_bill_text(bill):
     
     return text, url
 
+
 def is_html_available(bill):
-    '''
+    """
     Determines if an HTML link is available for a legislative bill.
 
     Inputs:
@@ -122,7 +126,7 @@ def is_html_available(bill):
 
     Returns:
         boolean: True if an HTML link is available for the bill, False otherwise.
-    '''
+    """
     for version in bill["versions"]:
         for link in version["links"]:
             if link["media_type"] == "text/html":
@@ -130,8 +134,9 @@ def is_html_available(bill):
 
     return False
 
+
 def get_html_text(bill):
-    '''
+    """
     Returns the plain text of a legislative bill obtained from an HTML link.
 
     Inputs:
@@ -139,7 +144,7 @@ def get_html_text(bill):
     
     Returns:
         text (str): The plain text of the bill from the HTML link.
-    '''
+    """
     bill_dict = dict()
     for version in bill["versions"]:
         for link in version["links"]:
@@ -152,8 +157,9 @@ def get_html_text(bill):
     
     return text, link["url"]
 
+
 def get_pdf_text(bill):
-    '''
+    """
     Returns the plain text of a legislative bill obtained from a PDF link.
 
     Inputs:
@@ -161,7 +167,7 @@ def get_pdf_text(bill):
     
     Returns:
         text (str): The plain text of the bill from the PDF link.
-    '''
+    """
     for version in bill["versions"]:
         for link in version["links"]:
             if link["media_type"] == "application/pdf":
@@ -174,8 +180,9 @@ def get_pdf_text(bill):
 
     return text, link["url"]
 
+
 def write_bills_and_page_to_file(state, bills, page_num):
-    '''
+    """
     Appends bills dictionary to file with name "bills_{state}.json"
 
     Inputs:
@@ -184,16 +191,17 @@ def write_bills_and_page_to_file(state, bills, page_num):
 
     Returns:
         None
-    '''
-
-    with open(f"cody_bills/data_extraction/bills_{state}.json", "a") as f: #appends to the end of the file
+    """
+    #appends to the end of the file
+    with open(f"cody_bills/data_extraction/bills_{state}.json", "a") as f: 
             json.dump(bills, f, indent = 4)
 
     with open(f"cody_bills/data_extraction/page_{state}.txt", "w") as f:
         f.write(str(page_num))
 
+
 def scraper(states, date, key):
-    '''
+    """
     Scrapes data of bills from the Open States API for given list of states and a
     date of creation of the bill and writes the data to a file in json format. It
     also saves the page number for each state to a file in case the requests per
@@ -207,8 +215,8 @@ def scraper(states, date, key):
 
     Returns:
         Nothing - creates the json and txt files in the directory
-    '''
-    for state in STATES:
+    """
+    for state in states:
         # Creating a page file and number in case the requests per day are 
         # limited so that we can continue the next day with the same key in 
         # the page where we finish the previous day
@@ -216,14 +224,14 @@ def scraper(states, date, key):
 
         bills_dictionary = dict()
         while True: # this can be changed for testing the code to a few number of pages
-            url = get_url(state, DATE_CREATED, page, KEY)
+            url = get_url(state, date, page, key)
             request1 = requests.get(url)
             bills_lst = json.loads(request1.text)["results"]
             
             n_bills = 0
             for bill in bills_lst:
                 bill_dict = get_bill_dict(bill)
-                if not bill_dict:
+                if not bill_dict: # no dictionary for the bill
                     continue
                 bills_dictionary[bill["id"]] = bill_dict
                 n_bills += 1
@@ -235,8 +243,9 @@ def scraper(states, date, key):
 
         write_bills_and_page_to_file(state, bills_dictionary, page)
 
+
 if __name__ == "__main__":
-    KEY = read_key("cody_bills/data_extraction/key.txt") # getting key from local directory
-    STATES = ["Texas", "Pennsylvania", "Illinois"] # one state for html and one for pdf
-    DATE_CREATED = "2022-01-01" # for bills created 2022-latest data
-    scraper(STATES, DATE_CREATED, KEY)
+    key = read_key("cody_bills/data_extraction/key.txt") # getting key from local directory
+    states = ["Texas", "Pennsylvania", "Illinois"] # using Illinois to test pdf scraping
+    date_created = "2022-01-01" # for bills created 2022-latest data
+    scraper(states, date_created, key)
